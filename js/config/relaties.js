@@ -216,7 +216,7 @@ export const RelatieQueries = {
 
     // Haal alle problemen op in één query voor performance
     let problemenUrl = LIJSTEN.problemenPleeglocaties.endpoints.alleItems() + 
-                       '?$expand=Eigenaar,Beoordelaar,Melder';
+                       '?$select=*,Eigenaar/Title,Beoordelaar/Title,Melder/Title&$expand=Eigenaar,Beoordelaar,Melder';
     if (filterProblemen) {
       problemenUrl += `&$filter=${filterProblemen}`;
     }

@@ -34,7 +34,7 @@ export const DDH_CONFIG = {
   relaties: relatiesConfig.LIJST_RELATIES,
   
   // Constanten en business rules
-  constanten: constantenConfig.DDH_CONSTANTEN,
+  constanten: constantenConfig,
   
   // Helper functies
   helpers: {
