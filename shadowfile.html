@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DDH Dashboard (Shadow)</title>
+    
+    <!-- Basis CSS -->
+    <style>
+        /* Basis styling (grotendeels overgenomen van DDH.aspx) */
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        .ddh-app {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .ddh-header {
+            background-color: #005a9e; /* Iets donkerder blauw */
+            color: white;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .ddh-header h1 { margin: 0 0 5px 0; font-size: 26px; }
+        .ddh-header p { margin: 0; opacity: 0.9; font-size: 14px; }
+
+        /* Actie Knoppen Boven */
+        .top-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary {
+            background-color: #0078d4;
+            color: white;
+        }
+        .btn-primary:hover { background-color: #005a9e; }
+        .btn-secondary {
+            background-color: #e1e1e1;
+            color: #333;
+            border: 1px solid #ccc;
+        }
+        .btn-secondary:hover { background-color: #d1d1d1; }
+
+        /* Content area */
+        .ddh-content {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            overflow: hidden; /* Houdt de tabel-randen netjes */
+        }
+        .ddh-content h2 {
+            margin: 0;
+            padding: 20px;
+            font-size: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        /* Data tabel */
+        .data-tabel-container {
+            overflow-x: auto;
+        }
+        .data-tabel {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .data-tabel th, .data-tabel td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            white-space: nowrap;
+        }
+        .data-tabel th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+            position: sticky;
+            top: 0;
+        }
+        .data-tabel tr.dh-row:hover {
+            background-color: #f5f5f5;
+            cursor: pointer;
+        }
+        .data-tabel tr.probleem-row {
+            background-color: #fafafa;
+        }
+        .data-tabel tr.probleem-row td {
+            padding-left: 40px; /* Indentatie voor problemen */
+            border-color: #f0f0f0;
+        }
+        .data-tabel tr.probleem-row:hover {
+            background-color: #f0f0f0;
+        }
+        .probleem-header-row {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            color: #444;
+        }
+        .probleem-header-row td {
+            padding-top: 10px;
+            padding-bottom: 10px;
+            padding-left: 25px !important;
+        }
+
+        /* Expander Icoon */
+        .expander {
+            display: inline-block;
+            width: 20px;
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+        .expander.expanded {
+            transform: rotate(90deg);
+        }
+
+        /* Status badges */
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+        .status-aangemeld { background-color: #fff4ce; color: #855e00; }
+        .status-in-behandeling { background-color: #cce5ff; color: #004085; }
+        .status-uitgezet-bij-oi { background-color: #d4edda; color: #155724; }
+        .status-opgelost { background-color: #e2e3e5; color: #383d41; }
+        .status-aangevraagd { background-color: #fff4ce; color: #855e00; }
+        .status-instemming-verleend { background-color: #d4edda; color: #155724; }
+
+        /* Modal styling */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-header h2 { margin: 0; font-size: 22px; }
+        .modal-close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #888;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        .form-group label {
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div id="ddh-dashboard-root"></div>
+
+    <!-- React en ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+    <script type="module">
+        const { createElement: h, useState, useEffect, useCallback } = window.React;
+        const { createRoot } = window.ReactDOM;
+
+        // --- MOCK DATA & SERVICES ---
+        let placeholderData = [
+            {
+                Id: 1,
+                Title: 'Kruising Hoofdstraat - Kerkstraat',
+                Gemeente: 'Groningen',
+                Status_x0020_B_x0026_S: 'Instemming verleend',
+                Waarschuwingsperiode: 'Ja',
+                problemen: [
+                    { Id: 101, Title: 'Kruising Hoofdstraat - Kerkstraat', Gemeente: 'Groningen', Feitcodegroep: 'Verkeersborden', Opgelost_x003f_: 'Aangemeld', Probleembeschrijving: 'Stopbord is gedraaid en niet meer zichtbaar voor verkeer.', Aanmaakdatum: '2025-07-01T10:00:00Z' },
+                    { Id: 102, Title: 'Kruising Hoofdstraat - Kerkstraat', Gemeente: 'Groningen', Feitcodegroep: 'Parkeren', Opgelost_x003f_: 'In behandeling', Probleembeschrijving: 'Auto\'s parkeren systematisch op de stoep.', Aanmaakdatum: '2025-07-05T14:30:00Z' }
+                ]
+            },
+            {
+                Id: 2,
+                Title: 'Schoolzone De Regenboog',
+                Gemeente: 'Utrecht',
+                Status_x0020_B_x0026_S: 'Aangevraagd',
+                Waarschuwingsperiode: 'Nee',
+                problemen: []
+            },
+            {
+                Id: 3,
+                Title: 'Industrieterrein Westpoort, afslag S102',
+                Gemeente: 'Amsterdam',
+                Status_x0020_B_x0026_S: 'In behandeling',
+                Waarschuwingsperiode: 'Ja',
+                problemen: [
+                    { Id: 103, Title: 'Industrieterrein Westpoort, afslag S102', Gemeente: 'Amsterdam', Feitcodegroep: 'Rijgedrag', Opgelost_x003f_: 'Opgelost', Probleembeschrijving: 'Vrachtwagens negeren het inrijverbod na 22:00.', Aanmaakdatum: '2025-06-15T23:10:00Z' }
+                ]
+            }
+        ];
+
+        const mockDataService = {
+            fetchAll: () => new Promise(resolve => setTimeout(() => resolve([...placeholderData]), 500)),
+            addDH: (item) => new Promise(resolve => {
+                const newDH = { ...item, Id: Date.now(), problemen: [] };
+                placeholderData.push(newDH);
+                resolve(newDH);
+            }),
+            addProblem: (item) => new Promise((resolve, reject) => {
+                const dhItem = placeholderData.find(dh => dh.Title === item.Title && dh.Gemeente === item.Gemeente);
+                if (dhItem) {
+                    const newProblem = { ...item, Id: Date.now(), Aanmaakdatum: new Date().toISOString() };
+                    dhItem.problemen.push(newProblem);
+                    resolve(newProblem);
+                } else {
+                    reject(new Error('DH locatie niet gevonden'));
+                }
+            })
+        };
+
+        // --- REACT COMPONENTEN ---
+
+        const IconExpand = () => h('svg', { viewBox: '0 0 24 24', style: { color: '#0078d4' } }, 
+            h('path', { d: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z', fill: 'currentColor' })
+        );
+
+        const IconCollapse = () => h('svg', { viewBox: '0 0 24 24', style: { color: '#d83b01' } }, 
+            h('path', { d: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z', fill: 'currentColor' })
+        );
+
+        const SubmissionModal = ({ modalConfig, closeModal, onFormSubmit }) => {
+            if (!modalConfig) return null;
+
+            const { type, data } = modalConfig;
+            const isDH = type === 'dh';
+            const title = isDH ? 'Nieuwe Handhavingslocatie' : `Nieuw Probleem voor ${data.Title}`;
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const submissionData = Object.fromEntries(formData.entries());
+                onFormSubmit(type, submissionData);
+            };
+
+            return h('div', { className: 'modal-overlay' },
+                h('div', { className: 'modal-content' },
+                    h('form', { onSubmit: handleSubmit },
+                        h('div', { className: 'modal-header' },
+                            h('h2', null, title),
+                            h('button', { type: 'button', className: 'modal-close-btn', onClick: closeModal }, '×')
+                        ),
+                        isDH ? h(DHFormFields) : h(ProbleemFormFields, { dhData: data }),
+                        h('div', { className: 'modal-footer' },
+                            h('button', { type: 'button', className: 'btn btn-secondary', onClick: closeModal }, 'Annuleren'),
+                            h('button', { type: 'submit', className: 'btn btn-primary' }, 'Opslaan')
+                        )
+                    )
+                )
+            );
+        };
+
+        const DHFormFields = () => {
+            return h('div', { className: 'form-grid' },
+                h('div', { className: 'form-group full-width' },
+                    h('label', { htmlFor: 'Title' }, 'Titel / Locatie'),
+                    h('input', { type: 'text', id: 'Title', name: 'Title', required: true })
+                ),
+                h('div', { className: 'form-group' },
+                    h('label', { htmlFor: 'Gemeente' }, 'Gemeente'),
+                    h('input', { type: 'text', id: 'Gemeente', name: 'Gemeente', required: true })
+                ),
+                h('div', { className: 'form-group' },
+                    h('label', { htmlFor: 'Feitcodegroep' }, 'Feitcodegroep'),
+                    h('select', { id: 'Feitcodegroep', name: 'Feitcodegroep' },
+                        h('option', null, 'Verkeersborden'),
+                        h('option', null, 'Parkeren'),
+                        h('option', null, 'Rijgedrag')
+                    )
+                )
+            );
+        };
+
+        const ProbleemFormFields = ({ dhData }) => {
+            return h('div', { className: 'form-grid' },
+                h('div', { className: 'form-group' },
+                    h('label', { htmlFor: 'Title' }, 'Pleeglocatie'),
+                    h('input', { type: 'text', id: 'Title', name: 'Title', readOnly: true, value: dhData.Title })
+                ),
+                h('div', { className: 'form-group' },
+                    h('label', { htmlFor: 'Gemeente' }, 'Gemeente'),
+                    h('input', { type: 'text', id: 'Gemeente', name: 'Gemeente', readOnly: true, value: dhData.Gemeente })
+                ),
+                h('div', { className: 'form-group full-width' },
+                    h('label', { htmlFor: 'Probleembeschrijving' }, 'Probleembeschrijving'),
+                    h('textarea', { id: 'Probleembeschrijving', name: 'Probleembeschrijving', required: true })
+                ),
+                h('div', { className: 'form-group' },
+                    h('label', { htmlFor: 'Feitcodegroep' }, 'Feitcodegroep'),
+                    h('select', { id: 'Feitcodegroep', name: 'Feitcodegroep' },
+                        h('option', null, 'Verkeersborden'),
+                        h('option', null, 'Parkeren'),
+                        h('option', null, 'Rijgedrag')
+                    )
+                )
+            );
+        };
+
+        const DashboardApp = () => {
+            const [data, setData] = useState([]);
+            const [loading, setLoading] = useState(true);
+            const [error, setError] = useState(null);
+            const [expandedRows, setExpandedRows] = useState(new Set());
+            const [modalConfig, setModalConfig] = useState(null);
+
+            const fetchData = useCallback(async () => {
+                setLoading(true);
+                setError(null);
+                try {
+                    const result = await mockDataService.fetchAll();
+                    setData(result);
+                } catch (err) {
+                    setError(err.message || 'Kon data niet laden.');
+                } finally {
+                    setLoading(false);
+                }
+            }, []);
+
+            useEffect(() => {
+                fetchData();
+            }, [fetchData]);
+
+            const handleFormSubmit = async (type, submissionData) => {
+                try {
+                    if (type === 'dh') {
+                        await mockDataService.addDH(submissionData);
+                    } else {
+                        await mockDataService.addProblem(submissionData);
+                    }
+                    setModalConfig(null);
+                    fetchData(); // Refresh data
+                } catch (err) {
+                    alert(`Fout bij opslaan: ${err.message}`);
+                }
+            };
+
+            const toggleRow = (id) => {
+                const newExpandedRows = new Set(expandedRows);
+                if (newExpandedRows.has(id)) {
+                    newExpandedRows.delete(id);
+                } else {
+                    newExpandedRows.add(id);
+                }
+                setExpandedRows(newExpandedRows);
+            };
+
+            const renderStatusBadge = (status) => {
+                const className = `status-badge status-${(status || '').toLowerCase().replace(/\s+/g, '-')}`;
+                return h('span', { className }, status || '-');
+            };
+
+            const renderTableRows = () => {
+                const rows = [];
+                data.forEach(dh => {
+                    const isExpanded = expandedRows.has(dh.Id);
+                    const hasProblemen = dh.problemen && dh.problemen.length > 0;
+
+                    rows.push(h('tr', { key: dh.Id, className: `dh-row ${hasProblemen ? 'expandable' : ''}`, onClick: () => hasProblemen && toggleRow(dh.Id) },
+                        h('td', { style: { display: 'flex', alignItems: 'center' } }, 
+                            h('span', { className: `expander ${isExpanded ? 'expanded' : ''}` }, 
+                                hasProblemen ? (isExpanded ? h(IconCollapse) : h(IconExpand)) : null
+                            ),
+                            dh.Title
+                        ),
+                        h('td', null, dh.Gemeente),
+                        h('td', null, renderStatusBadge(dh.Status_x0020_B_x0026_S)),
+                        h('td', null, dh.Waarschuwingsperiode),
+                        h('td', null, dh.problemen?.length || 0),
+                        h('td', null, 
+                            h('button', { 
+                                className: 'btn btn-secondary', 
+                                onClick: (e) => {
+                                    e.stopPropagation();
+                                    setModalConfig({ type: 'probleem', data: dh });
+                                }
+                            }, 'Nieuw Probleem')
+                        )
+                    ));
+
+                    if (isExpanded && hasProblemen) {
+                        rows.push(h('tr', { key: `ph-${dh.Id}`, className: 'probleem-header-row' },
+                            h('td', { colSpan: 6 }, 'Gemelde Problemen')
+                        ));
+                        dh.problemen.forEach(p => {
+                            rows.push(h('tr', { key: `p-${p.Id}`, className: 'probleem-row' },
+                                h('td', null, p.Probleembeschrijving),
+                                h('td', null, p.Feitcodegroep),
+                                h('td', null, renderStatusBadge(p.Opgelost_x003f_)),
+                                h('td', null, new Date(p.Aanmaakdatum).toLocaleDateString('nl-NL')),
+                                h('td', { colSpan: 2 }, '')
+                            ));
+                        });
+                    }
+                });
+                return rows;
+            };
+
+            if (loading) {
+                return h('div', { className: 'loading-overlay' }, 'Data wordt geladen...');
+            }
+
+            if (error) {
+                return h('div', { className: 'error-overlay' }, `Fout: ${error}`);
+            }
+
+            return h('div', { className: 'ddh-app' },
+                h(SubmissionModal, { modalConfig, closeModal: () => setModalConfig(null), onFormSubmit: handleFormSubmit }),
+                h('header', { className: 'ddh-header' },
+                    h('h1', null, 'DDH Unified Dashboard'),
+                    h('p', null, 'Overzicht van handhavingslocaties en gerelateerde problemen')
+                ),
+                h('div', { className: 'top-actions' },
+                    h('button', { 
+                        className: 'btn btn-primary',
+                        onClick: () => setModalConfig({ type: 'dh', data: {} })
+                    }, 'Nieuwe Handhavingslocatie')
+                ),
+                h('main', { className: 'ddh-content' },
+                    h('h2', null, 
+                        'Handhavingslocaties', 
+                        h('span', { className: 'hint' }, '(klik op een rij om problemen te tonen)')
+                    ),
+                    h('div', { className: 'data-tabel-container' },
+                        h('table', { className: 'data-tabel' },
+                            h('thead', null, h('tr', null,
+                                h('th', null, 'Locatie'),
+                                h('th', null, 'Gemeente'),
+                                h('th', null, 'Status B&S'),
+                                h('th', null, 'Waarschuwing'),
+                                h('th', null, 'Problemen'),
+                                h('th', null, 'Acties')
+                            )),
+                            h('tbody', null, renderTableRows())
+                        )
+                    )
+                )
+            );
+        };
+
+        const rootElement = document.getElementById('ddh-dashboard-root');
+        const root = createRoot(rootElement);
+        root.render(h(DashboardApp));
+
+    </script>
+</body>
+</html>
