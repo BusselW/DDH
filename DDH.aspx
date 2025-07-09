@@ -21,12 +21,15 @@
             padding: 0;
             background-color: #f0f2f5;
             color: #333;
+            overflow-y: auto;
+            min-height: 100vh;
         }
 
         .ddh-app {
             width: 100%;
             padding: 10px 15px;
             margin: 0;
+            min-height: 100vh;
         }
 
         /* Header styling */
@@ -504,16 +507,13 @@
         /* Loading en error overlays */
         .loading-overlay,
         .error-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            min-height: 200px;
             background: rgba(255,255,255,0.8);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 18px;
+            padding: 40px;
         }
 
         .loading-overlay {
