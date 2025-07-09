@@ -14,6 +14,7 @@ const { createRoot } = window.ReactDOM;
 
 import { DDHDashboard } from './components/dashboard.js';
 import { createDDHDataService } from './services/ddhDataService.js';
+import { createMockDataService } from './services/mockDataService.js';
 
 /**
  * Main application class
@@ -36,8 +37,17 @@ export class DDHApp {
             // Store configuration
             this.config = config;
             
+            // Check if we're in mock mode (local testing)
+            const isMockMode = config.sharepoint?.baseUrl?.includes('localhost') || 
+                             config.sharepoint?.baseUrl?.includes('127.0.0.1');
+            
             // Create data service
-            this.dataService = createDDHDataService(config);
+            if (isMockMode) {
+                console.log('🧪 Using mock data service for local testing');
+                this.dataService = createMockDataService();
+            } else {
+                this.dataService = createDDHDataService(config);
+            }
             
             // Get root element
             const rootElement = document.getElementById('ddh-root');
