@@ -59,7 +59,7 @@ export const renderLocationInfo = (dh) => {
             href: dh.Link_x0020_Algemeen_x0020_PV.Url,
             target: '_blank',
             className: 'location-link'
-        }, h(IconDocument), 'Algemeen PV'));
+        }, IconDocument(), 'Algemeen PV'));
     }
     
     if (dh.Link_x0020_Schouwrapporten?.Url) {
@@ -68,7 +68,7 @@ export const renderLocationInfo = (dh) => {
             href: dh.Link_x0020_Schouwrapporten.Url,
             target: '_blank',
             className: 'location-link'
-        }, h(IconReport), 'Schouwrapporten'));
+        }, IconReport(), 'Schouwrapporten'));
     }
     
     if (dh.Instemmingsbesluit?.Url) {
@@ -77,11 +77,11 @@ export const renderLocationInfo = (dh) => {
             href: dh.Instemmingsbesluit.Url,
             target: '_blank',
             className: 'location-link'
-        }, h(IconDocument), 'Instemmingsbesluit'));
+        }, IconDocument(), 'Instemmingsbesluit'));
     }
 
     return h('div', { className: 'location-info' },
-        h('h3', null, h(IconLocation), dh.Title, ' - ', dh.Gemeente),
+        h('h3', null, IconLocation(), dh.Title, ' - ', dh.Gemeente),
         h('div', { className: 'location-details' },
             h('div', { className: 'location-detail' },
                 h('div', { className: 'location-detail-label' }, 'Status B&S'),
@@ -148,7 +148,7 @@ export const renderChildContent = ({ dh }) => {
     return h('div', { className: 'child-container' },
         renderLocationInfo(dh),
         h('div', { className: 'section-title' },
-            h(IconProblem),
+            IconProblem(),
             `Gemelde Problemen (${dh.problemen.length})`
         ),
         h('div', { className: 'problems-grid' },
@@ -182,7 +182,7 @@ export const DDHTable = ({ data, expandedRows, toggleRow, onNewProblem }) => {
             },
                 h('td', { style: { display: 'flex', alignItems: 'center' } }, 
                     h('span', { className: `expander ${isExpanded ? 'expanded' : ''}` }, 
-                        hasProblemen ? (isExpanded ? h(IconCollapse) : h(IconExpand)) : null
+                        hasProblemen ? (isExpanded ? IconCollapse() : IconExpand()) : null
                     ),
                     h('span', { style: { fontWeight: hasProblemen ? '600' : 'normal' } }, dh.Title)
                 ),

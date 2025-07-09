@@ -148,7 +148,7 @@ export const DDHDashboard = ({ config, dataService }) => {
             h('button', { 
                 className: 'btn btn-primary',
                 onClick: handleNewDHLocation
-            }, h(IconPlus), 'Nieuwe Handhavingslocatie')
+            }, IconPlus(), 'Nieuwe Handhavingslocatie')
         ),
         
         // Main content
