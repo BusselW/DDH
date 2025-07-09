@@ -25,7 +25,6 @@
 
         .ddh-app {
             width: 100%;
-            min-height: 100vh;
             padding: 10px 15px;
             margin: 0;
         }
@@ -276,6 +275,12 @@
             gap: 8px;
         }
 
+        .location-info h3 svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+
         .location-details {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -332,6 +337,7 @@
         .location-link svg {
             width: 14px;
             height: 14px;
+            flex-shrink: 0;
         }
 
         .section-title {
@@ -342,6 +348,12 @@
             display: flex;
             align-items: center;
             gap: 8px;
+        }
+
+        .section-title svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
         }
 
         /* Expander Icoon */
@@ -356,8 +368,8 @@
         }
 
         .expander svg {
-            width: 100%;
-            height: 100%;
+            width: 16px;
+            height: 16px;
         }
 
         .expander.expanded {
