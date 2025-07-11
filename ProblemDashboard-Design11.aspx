@@ -5,139 +5,115 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DDH Portal - Design 11: Newspaper Layout</title>
     <style>
-        * {
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Georgia', serif;
-            margin: 0;
-            background-color: #fdfdfd;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-        .header {
-            background-color: #fff;
-            padding: 20px;
-            text-align: center;
-            border-bottom: 3px solid #333;
-        }
-        .header h1 {
-            margin: 0;
-            font-family: 'Playfair Display', serif;
-            font-size: 3em;
-            font-weight: 900;
-        }
-        .navigation {
-            background-color: #333;
-            padding: 10px 0;
-            text-align: center;
-        }
-        .navigation a {
-            color: white;
-            text-decoration: none;
-            padding: 10px 20px;
-            margin: 0 10px;
-            font-family: 'Helvetica Neue', sans-serif;
-            font-size: 0.9em;
-            text-transform: uppercase;
-        }
-        .container {
-            display: flex;
-            flex: 1;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .main-content {
-            flex: 3;
-            padding-right: 20px;
-        }
-        .sidebar {
-            flex: 1;
-            background-color: #fff;
-            padding: 20px;
-            border-left: 1px solid #ddd;
-        }
-        .article {
-            background-color: #fff;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        .article h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: 2em;
-            margin-top: 0;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-        }
-        .article p {
-            line-height: 1.7;
-            text-align: justify;
-        }
-        .sidebar h3 {
-            font-family: 'Helvetica Neue', sans-serif;
-            text-transform: uppercase;
-            border-bottom: 2px solid #333;
-            padding-bottom: 5px;
-        }
-        .sidebar ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        .sidebar ul li a {
-            text-decoration: none;
-            color: #555;
-            padding: 8px 0;
-            display: block;
-            border-bottom: 1px dotted #ccc;
-        }
-        .footer {
-            background-color: #333;
-            color: white;
-            text-align: center;
-            padding: 20px;
-            font-size: 0.9em;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400&display=swap');
+        * { box-sizing: border-box; }
+        body { font-family: 'Roboto', sans-serif; margin: 0; background-color: #f8f8f8; color: #333; }
+        .dashboard-container { max-width: 1200px; margin: auto; padding: 20px; }
+        .header { text-align: center; padding: 20px 0; border-bottom: 3px solid #333; margin-bottom: 20px; }
+        .header h1 { font-family: 'Playfair Display', serif; margin: 0; font-size: 3em; }
+        .main-content { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+        .items-column { display: flex; flex-direction: column; gap: 20px; }
+        .details-column { position: sticky; top: 20px; }
+        .item-card { background-color: #fff; border: 1px solid #ddd; padding: 15px; cursor: pointer; transition: box-shadow 0.2s; }
+        .item-card:hover { box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .item-card.active { border-left: 4px solid #d1a054; }
+        .card-title { font-family: 'Playfair Display', serif; font-size: 1.5em; margin: 0 0 10px 0; }
+        .card-stats { font-size: 0.9em; color: #666; }
+        .details-panel { background-color: #fff; border: 1px solid #ddd; padding: 20px; }
+        .details-title { font-family: 'Playfair Display', serif; font-size: 2em; margin: 0 0 15px 0; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .probleem-list li { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px dotted #ccc; }
+        .back-button { font-family: 'Roboto', sans-serif; background: none; border: 1px solid #333; color: #333; padding: 8px 15px; cursor: pointer; margin-bottom: 20px; text-transform: uppercase; font-size: 0.8em; }
+        .loading-state { text-align: center; padding: 50px; font-size: 1.5em; }
     </style>
 </head>
 <body>
+    <div id="dashboard-root" class="dashboard-container"></div>
 
-    <header class="header">
-        <h1>Het DDH Nieuws</h1>
-    </header>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script type="module">
+        const { createElement: h, useState, useEffect } = window.React;
+        const { createRoot } = window.ReactDOM;
+        const { DDH_CONFIG } = await import('./js/config/index.js');
 
-    <nav class="navigation">
-        <a href="#">Home</a>
-        <a href="#">Binnenland</a>
-        <a href="#">Buitenland</a>
-        <a href="#">Economie</a>
-        <a href="#">Sport</a>
-    </nav>
+        const Dashboard = () => {
+            const [view, setView] = useState('gemeenten');
+            const [data, setData] = useState([]);
+            const [loading, setLoading] = useState(true);
+            const [selectedGemeente, setSelectedGemeente] = useState(null);
+            const [selectedPleeglocatie, setSelectedPleeglocatie] = useState(null);
 
-    <div class="container">
-        <main class="main-content">
-            <section class="article">
-                <h2>Design 11: Krantenstijl</h2>
-                <p>Dit ontwerp imiteert de lay-out van een krant, met een focus op typografie en een gestructureerde, redactionele stijl. De content is georganiseerd in artikelen en kolommen voor een klassieke en leesbare presentatie.</p>
-                <p>De keuze voor lettertypes zoals Georgia en Playfair Display versterkt het traditionele gevoel, terwijl de duidelijke hiërarchie zorgt voor een overzichtelijke pagina.</p>
-            </section>
-        </main>
+            useEffect(() => {
+                const fetchData = async () => {
+                    try {
+                        const result = await DDH_CONFIG.queries.haalAllesMetRelaties();
+                        setData(result);
+                        if (result.length > 0) {
+                            const gemeenten = Object.keys(result.reduce((acc, item) => { acc[item.Gemeente] = true; return acc; }, {}));
+                            setSelectedGemeente(gemeenten[0]);
+                        }
+                    } catch (error) {
+                        console.error('Data loading error:', error);
+                    } finally {
+                        setLoading(false);
+                    }
+                };
+                fetchData();
+            }, []);
 
-        <aside class="sidebar">
-            <h3>Categorieën</h3>
-            <ul>
-                <li><a href="#">Technologie</a></li>
-                <li><a href="#">Gezondheid</a></li>
-                <li><a href="#">Wetenschap</a></li>
-                <li><a href="#">Opinie</a></li>
-            </ul>
-        </aside>
-    </div>
+            const goBack = () => {
+                setSelectedPleeglocatie(null);
+            };
 
-    <footer class="footer">
-        <p>&copy; 2025 DDH. Alle rechten voorbehouden.</p>
-    </footer>
+            if (loading) {
+                return h('div', { className: 'loading-state' }, 'Data wordt geladen...');
+            }
 
+            const gemeentenData = data.reduce((acc, item) => {
+                const gemeente = item.Gemeente;
+                if (!acc[gemeente]) acc[gemeente] = { pleeglocaties: [] };
+                acc[gemeente].pleeglocaties.push(item);
+                return acc;
+            }, {});
+
+            const currentPleeglocaties = selectedGemeente ? gemeentenData[selectedGemeente].pleeglocaties : [];
+
+            return h('div', null,
+                h('header', { className: 'header' }, h('h1', null, 'Het DDH Dagblad')),
+                h('div', { className: 'main-content' },
+                    h('div', { className: 'items-column' },
+                        !selectedPleeglocatie && h('h2', { className: 'card-title' }, 'Pleeglocaties in ', selectedGemeente),
+                        selectedPleeglocatie && h('button', { className: 'back-button', onClick: goBack }, 'Alle locaties'),
+                        !selectedPleeglocatie && currentPleeglocaties.map(pleeglocatie => 
+                            h('div', { key: pleeglocatie.Id, className: 'item-card', onClick: () => setSelectedPleeglocatie(pleeglocatie) },
+                                h('h3', { className: 'card-title' }, pleeglocatie.Title),
+                                h('p', { className: 'card-stats' }, `${pleeglocatie.problemen.length} problemen gemeld`)
+                            )
+                        ),
+                        selectedPleeglocatie && selectedPleeglocatie.problemen.map(probleem => 
+                            h('div', { key: probleem.Id, className: 'item-card' },
+                                h('h3', { className: 'card-title' }, `Probleem #${probleem.Id}`),
+                                h('p', null, h('strong', null, 'Status: '), probleem.Opgelost_x003f_)
+                            )
+                        )
+                    ),
+                    h('aside', { className: 'details-column' },
+                        h('div', { className: 'details-panel' },
+                            !selectedPleeglocatie && h('h2', { className: 'details-title' }, 'Selecteer een locatie'),
+                            selectedPleeglocatie && h('div', null, 
+                                h('h2', { className: 'details-title' }, selectedPleeglocatie.Title),
+                                h('p', null, h('strong', null, 'Contactpersoon: '), selectedPleeglocatie.emailContactpersoon?.Description || 'N/A'),
+                                h('h3', { className: 'card-title' }, 'Problemen'),
+                                h('ul', { className: 'probleem-list' }, selectedPleeglocatie.problemen.map(p => h('li', {key: p.Id}, p.Probleembeschrijving)))
+                            )
+                        )
+                    )
+                )
+            );
+        };
+
+        const root = createRoot(document.getElementById('dashboard-root'));
+        root.render(h(Dashboard));
+    </script>
 </body>
 </html>

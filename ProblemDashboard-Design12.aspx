@@ -5,120 +5,118 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DDH Portal - Design 12: Mobile-First</title>
     <style>
-        * {
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            background-color: #f0f2f5;
-            color: #333;
-        }
-        .header {
-            background-color: #fff;
-            padding: 15px;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 1.5em;
-            color: #007bff;
-        }
-        .main-content {
-            padding: 80px 15px 80px 15px;
-        }
-        .card {
-            background-color: #fff;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-        }
-        .card h2 {
-            margin-top: 0;
-            font-size: 1.2em;
-            color: #007bff;
-        }
-        .card p {
-            line-height: 1.6;
-        }
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background-color: #fff;
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
-        }
-        .bottom-nav a {
-            color: #007bff;
-            text-decoration: none;
-            text-align: center;
-            padding: 5px;
-            flex-grow: 1;
-        }
-        .bottom-nav a.active {
-            color: #0056b3;
-        }
-        /* Desktop styles */
-        @media (min-width: 768px) {
-            body {
-                display: flex;
-            }
-            .header {
-                position: static;
-                width: auto;
-                box-shadow: none;
-            }
-            .sidebar {
-                width: 250px;
-                background-color: #e9ecef;
-                padding: 20px;
-                height: 100vh;
-            }
-            .main-content {
-                flex: 1;
-                padding: 40px;
-            }
-            .bottom-nav {
-                display: none;
-            }
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+        * { box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; margin: 0; background-color: #f4f5f7; }
+        #dashboard-root { padding-bottom: 70px; } /* Space for bottom nav */
+        .header { background-color: #fff; padding: 15px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 10; }
+        .header h1 { margin: 0; font-size: 1.2em; font-weight: 600; }
+        .content { padding: 15px; }
+        .card { background-color: #fff; border-radius: 8px; margin-bottom: 10px; padding: 15px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); cursor: pointer; }
+        .card-title { font-size: 1.1em; font-weight: 600; margin: 0 0 5px 0; }
+        .card-stats { font-size: 0.9em; color: #666; }
+        .pleeglocatie-card.has-problems { border-left: 4px solid #e53e3e; padding-left: 11px; }
+        .probleem-details { font-size: 0.9em; margin-top: 10px; }
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background-color: #fff; display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -1px 3px rgba(0,0,0,0.1); }
+        .nav-item { color: #888; text-decoration: none; text-align: center; font-size: 0.8em; }
+        .nav-item.active { color: #007aff; }
+        .loading-state { text-align: center; padding: 50px; font-size: 1.2em; }
     </style>
 </head>
 <body>
+    <div id="dashboard-root"></div>
 
-    <!-- This is a placeholder for desktop view sidebar -->
-    <div class="sidebar" style="display: none;">
-        <h2>Desktop Navigatie</h2>
-    </div>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script type="module">
+        const { createElement: h, useState, useEffect } = window.React;
+        const { createRoot } = window.ReactDOM;
+        const { DDH_CONFIG } = await import('./js/config/index.js');
 
-    <div style="flex: 1;">
-        <header class="header">
-            <h1>DDH Portaal</h1>
-        </header>
+        const Dashboard = () => {
+            const [view, setView] = useState('gemeenten');
+            const [data, setData] = useState([]);
+            const [loading, setLoading] = useState(true);
+            const [selectedGemeente, setSelectedGemeente] = useState(null);
+            const [selectedPleeglocatie, setSelectedPleeglocatie] = useState(null);
 
-        <main class="main-content">
-            <div class="card">
-                <h2>Design 12: Mobile-First</h2>
-                <p>Dit ontwerp is primair ontwikkeld voor mobiele apparaten. De lay-out is vloeibaar en past zich aan grotere schermen aan (responsive design). De navigatie bevindt zich aan de onderkant voor eenvoudige bediening met de duim.</p>
-            </div>
-        </main>
+            useEffect(() => {
+                const fetchData = async () => {
+                    try {
+                        const result = await DDH_CONFIG.queries.haalAllesMetRelaties();
+                        setData(result);
+                    } catch (error) {
+                        console.error('Data loading error:', error);
+                    } finally {
+                        setLoading(false);
+                    }
+                };
+                fetchData();
+            }, []);
 
-        <nav class="bottom-nav">
-            <a href="#" class="active">Home</a>
-            <a href="#">Taken</a>
-            <a href="#">Notificaties</a>
-            <a href="#">Profiel</a>
-        </nav>
-    </div>
+            const handleGemeenteClick = (gemeente) => {
+                setSelectedGemeente(gemeente);
+                setView('pleeglocaties');
+            };
 
+            const handlePleeglocatieClick = (pleeglocatie) => {
+                setSelectedPleeglocatie(pleeglocatie);
+                setView('problemen');
+            };
+
+            const getHeaderTitle = () => {
+                if (view === 'pleeglocaties') return selectedGemeente;
+                if (view === 'problemen') return selectedPleeglocatie.Title;
+                return 'Alle Gemeenten';
+            }
+
+            if (loading) {
+                return h('div', { className: 'loading-state' }, 'Laden...');
+            }
+
+            const gemeentenData = data.reduce((acc, item) => {
+                const gemeente = item.Gemeente;
+                if (!acc[gemeente]) acc[gemeente] = { pleeglocaties: 0, problemen: 0 };
+                acc[gemeente].pleeglocaties++;
+                acc[gemeente].problemen += item.problemen.length;
+                return acc;
+            }, {});
+
+            return h('div', null,
+                h('header', { className: 'header' }, h('h1', null, getHeaderTitle())),
+                h('main', { className: 'content' },
+                    view === 'gemeenten' && Object.entries(gemeentenData).map(([gemeente, stats]) => 
+                        h('div', { key: gemeente, className: 'card gemeente-card', onClick: () => handleGemeenteClick(gemeente) },
+                            h('h2', { className: 'card-title' }, gemeente),
+                            h('p', { className: 'card-stats' }, `${stats.pleeglocaties} locaties, ${stats.problemen} problemen`)
+                        )
+                    ),
+                    view === 'pleeglocaties' && data.filter(item => item.Gemeente === selectedGemeente).map(pleeglocatie =>
+                        h('div', { key: pleeglocatie.Id, className: `card pleeglocatie-card ${pleeglocatie.problemen.length > 0 ? 'has-problems' : ''}`, onClick: () => handlePleeglocatieClick(pleeglocatie) },
+                            h('h2', { className: 'card-title' }, pleeglocatie.Title),
+                            h('p', { className: 'card-stats' }, `${pleeglocatie.problemen.length} problemen`)
+                        )
+                    ),
+                    view === 'problemen' && selectedPleeglocatie.problemen.map(probleem => 
+                        h('div', { key: probleem.Id, className: 'card probleem-card' },
+                            h('h2', { className: 'card-title' }, `Probleem #${probleem.Id}`),
+                            h('div', { className: 'probleem-details' },
+                                h('p', null, h('strong', null, 'Status: '), probleem.Opgelost_x003f_),
+                                h('p', null, h('strong', null, 'Beschrijving: '), probleem.Probleembeschrijving)
+                            )
+                        )
+                    )
+                ),
+                h('nav', { className: 'bottom-nav' },
+                    h('a', { href: '#', className: `nav-item ${view === 'gemeenten' ? 'active' : ''}`, onClick: () => setView('gemeenten') }, 'Gemeenten'),
+                    h('a', { href: '#', className: `nav-item ${view === 'pleeglocaties' ? 'active' : ''}`, onClick: () => view === 'problemen' && setView('pleeglocaties') }, 'Locaties'),
+                    h('a', { href: '#', className: 'nav-item' }, 'Instellingen')
+                )
+            );
+        };
+
+        const root = createRoot(document.getElementById('dashboard-root'));
+        root.render(h(Dashboard));
+    </script>
 </body>
 </html>
