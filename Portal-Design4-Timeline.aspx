@@ -9,7 +9,7 @@
         * { box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 0; padding: 0; background: #fafafa; color: #333;
+            margin: 0; padding: 0 0 60px 0; background: #fafafa; color: #333;
         }
         .portal-container {
             max-width: 1600px; margin: 0 auto; padding: 20px;
@@ -453,8 +453,10 @@
         const { createElement: h, useState, useEffect, useMemo } = window.React;
         const { createRoot } = window.ReactDOM;
 
-        // Import configuration and SVG icons
+        // Import configuration, navigation and SVG icons
         const { DDH_CONFIG } = await import('./js/config/index.js');
+        const { TEMP_PLACEHOLDER_DATA } = await import('./js/components/pageNavigation.js');
+        const FooterNavigation = (await import('./js/components/FooterNavigation.js')).default;
         const SvgIcons = await import('./js/components/svgIcons.js');
         const { 
             HomeIcon, LocationIcon, BuildingIcon, CityIcon, CheckIcon, WarningIcon,
@@ -478,7 +480,9 @@
                         const result = await DDH_CONFIG.queries.haalAllesMetRelaties();
                         setData(result);
                     } catch (error) {
-                        console.error('Data loading error:', error);
+                        console.error('Data loading error, using placeholder data:', error);
+                        // Use placeholder data if SharePoint is not available
+                        setData(TEMP_PLACEHOLDER_DATA);
                     } finally {
                         setLoading(false);
                     }
@@ -1081,7 +1085,10 @@
                     currentLayer === 'gemeente' && renderGemeenteLayer(),
                     currentLayer === 'pleeglocatie' && renderPleeglocatieLayer(),
                     currentLayer === 'detail' && renderDetailLayer()
-                )
+                ),
+                
+                // Footer Navigation
+                h(FooterNavigation)
             );
         };
 

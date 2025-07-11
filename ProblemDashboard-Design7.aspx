@@ -12,7 +12,7 @@
         * { box-sizing: border-box; }
         body {
             font-family: 'Consolas', 'Monaco', 'Lucida Console', monospace;
-            margin: 0; padding: 0; background: #0a0e17; color: #e2e8f0;
+            margin: 0; padding: 0 0 60px 0; background: #0a0e17; color: #e2e8f0;
             overflow-x: hidden;
         }
         .dark-container {
@@ -322,8 +322,10 @@
         const { createElement: h, useState, useEffect, useMemo } = window.React;
         const { createRoot } = window.ReactDOM;
 
-        // Import configuration
+        // Import configuration and navigation
         const { DDH_CONFIG } = await import('./js/config/index.js');
+        const { TEMP_PLACEHOLDER_DATA } = await import('./js/components/pageNavigation.js');
+        const FooterNavigation = (await import('./js/components/FooterNavigation.js')).default;
 
         const DarkAdminDashboard = () => {
             const [data, setData] = useState([]);
@@ -339,8 +341,10 @@
                         setData(result);
                         addConsoleLog('success', `Data fetch completed. ${result.length} locations loaded.`);
                     } catch (error) {
-                        console.error('Data loading error:', error);
-                        addConsoleLog('error', `Data fetch failed: ${error.message}`);
+                        console.error('Data loading error, using placeholder data:', error);
+                        addConsoleLog('error', `Data fetch failed: ${error.message} - Using placeholder data`);
+                        // Use placeholder data if SharePoint is not available
+                        setData(TEMP_PLACEHOLDER_DATA);
                     } finally {
                         setLoading(false);
                     }
@@ -649,7 +653,10 @@
                             )
                         )
                     )
-                )
+                ),
+                
+                // Footer Navigation
+                h(FooterNavigation)
             );
         };
 

@@ -7,7 +7,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap');
         * { box-sizing: border-box; }
-        body { font-family: 'Nunito', sans-serif; margin: 0; background-color: #f0f7ff; color: #333; }
+        body { font-family: 'Nunito', sans-serif; margin: 0; padding: 0 0 60px 0; background-color: #f0f7ff; color: #333; }
         .dashboard-container { max-width: 1800px; margin: auto; padding: 20px; }
         .header { background: linear-gradient(45deg, #ff6b6b, #f9d423); color: white; padding: 20px; text-align: center; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .header h1 { margin: 0; font-size: 2.2em; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
@@ -32,6 +32,8 @@
         const { createElement: h, useState, useEffect } = window.React;
         const { createRoot } = window.ReactDOM;
         const { DDH_CONFIG } = await import('./js/config/index.js');
+        const { TEMP_PLACEHOLDER_DATA } = await import('./js/components/pageNavigation.js');
+        const FooterNavigation = (await import('./js/components/FooterNavigation.js')).default;
 
         const Dashboard = () => {
             const [view, setView] = useState('gemeenten');
@@ -46,7 +48,8 @@
                         const result = await DDH_CONFIG.queries.haalAllesMetRelaties();
                         setData(result);
                     } catch (error) {
-                        console.error('Data loading error:', error);
+                        console.error('Data loading error, using placeholder data:', error);
+                        setData(TEMP_PLACEHOLDER_DATA);
                     } finally {
                         setLoading(false);
                     }
@@ -105,7 +108,10 @@
                             )
                         )
                     )
-                )
+                ),
+                
+                // Footer Navigation
+                h(FooterNavigation)
             );
         };
 

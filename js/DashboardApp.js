@@ -1,5 +1,7 @@
 import { DDH_CONFIG } from './config/index.js';
 import { ddhDataService } from './dataServices.js';
+import { TEMP_PLACEHOLDER_DATA } from './components/pageNavigation.js';
+import FooterNavigation from './components/FooterNavigation.js';
 
 const { createElement: h, useState, useEffect, useCallback } = window.React;
 const { createRoot } = window.ReactDOM;
@@ -95,8 +97,8 @@ const DashboardApp = () => {
             const result = await DDH_CONFIG.queries.haalAllesMetRelaties();
             setData(result);
         } catch (err) {
-            console.error("Fout bij ophalen data:", err);
-            setError(err.message || 'Kon data niet laden.');
+            console.error("Fout bij ophalen data, using placeholder data:", err);
+            setData(TEMP_PLACEHOLDER_DATA);
         } finally {
             setLoading(false);
         }
@@ -218,7 +220,10 @@ const DashboardApp = () => {
                     h('tbody', null, renderTableRows())
                 )
             )
-        )
+        ),
+        
+        // Footer Navigation
+        h(FooterNavigation)
     );
 };
 

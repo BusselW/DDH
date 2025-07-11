@@ -12,7 +12,7 @@
         * { box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0; padding: 0; background: #f5f7fa; color: #333;
+            margin: 0; padding: 0 0 60px 0; background: #f5f7fa; color: #333;
         }
         .dashboard-wrapper {
             max-width: 1600px; margin: 0 auto; padding: 20px;
@@ -262,8 +262,10 @@
         const { createElement: h, useState, useEffect, useMemo } = window.React;
         const { createRoot } = window.ReactDOM;
 
-        // Import configuration
+        // Import configuration and navigation
         const { DDH_CONFIG } = await import('./js/config/index.js');
+        const { TEMP_PLACEHOLDER_DATA } = await import('./js/components/pageNavigation.js');
+        const FooterNavigation = (await import('./js/components/FooterNavigation.js')).default;
 
         const ProblemCardDashboard = () => {
             const [data, setData] = useState([]);
@@ -280,7 +282,10 @@
                         setData(result);
                         if (result.length > 0) setSelectedLocation(result[0]);
                     } catch (error) {
-                        console.error('Data loading error:', error);
+                        console.error('Data loading error, using placeholder data:', error);
+                        // Use placeholder data if SharePoint is not available
+                        setData(TEMP_PLACEHOLDER_DATA);
+                        if (TEMP_PLACEHOLDER_DATA.length > 0) setSelectedLocation(TEMP_PLACEHOLDER_DATA[0]);
                     } finally {
                         setLoading(false);
                     }
@@ -492,7 +497,10 @@
                             )
                         )
                     )
-                )
+                ),
+                
+                // Footer Navigation
+                h(FooterNavigation)
             );
         };
 

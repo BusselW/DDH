@@ -6,7 +6,7 @@
     <title>DDH Portal - Design 9: Professional Dark</title>
     <style>
         * { box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #1a1a1a; color: #f0f0f0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0 0 60px 0; background-color: #1a1a1a; color: #f0f0f0; }
         .dashboard-container { max-width: 1800px; margin: auto; padding: 20px; }
         .header { background-color: #2c2c2c; padding: 20px; text-align: center; border-bottom: 1px solid #444; margin-bottom: 20px; border-radius: 8px;}
         .header h1 { margin: 0; font-size: 2em; color: #00aaff; }
@@ -31,6 +31,8 @@
         const { createElement: h, useState, useEffect } = window.React;
         const { createRoot } = window.ReactDOM;
         const { DDH_CONFIG } = await import('./js/config/index.js');
+        const { TEMP_PLACEHOLDER_DATA } = await import('./js/components/pageNavigation.js');
+        const FooterNavigation = (await import('./js/components/FooterNavigation.js')).default;
 
         const Dashboard = () => {
             const [view, setView] = useState('gemeenten'); // gemeenten, pleeglocaties, problemen
@@ -45,7 +47,8 @@
                         const result = await DDH_CONFIG.queries.haalAllesMetRelaties();
                         setData(result);
                     } catch (error) {
-                        console.error('Data loading error:', error);
+                        console.error('Data loading error, using placeholder data:', error);
+                        setData(TEMP_PLACEHOLDER_DATA);
                     } finally {
                         setLoading(false);
                     }
@@ -104,7 +107,10 @@
                             )
                         )
                     )
-                )
+                ),
+                
+                // Footer Navigation
+                h(FooterNavigation)
             );
         };
 

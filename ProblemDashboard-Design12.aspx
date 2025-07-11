@@ -7,8 +7,8 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
         * { box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; margin: 0; background-color: #f4f5f7; }
-        #dashboard-root { padding-bottom: 70px; } /* Space for bottom nav */
+        body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; background-color: #f4f5f7; }
+        #dashboard-root { padding-bottom: 130px; } /* Space for bottom nav + footer nav */
         .header { background-color: #fff; padding: 15px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 10; }
         .header h1 { margin: 0; font-size: 1.2em; font-weight: 600; }
         .content { padding: 15px; }
@@ -32,6 +32,8 @@
         const { createElement: h, useState, useEffect } = window.React;
         const { createRoot } = window.ReactDOM;
         const { DDH_CONFIG } = await import('./js/config/index.js');
+        const { TEMP_PLACEHOLDER_DATA } = await import('./js/components/pageNavigation.js');
+        const FooterNavigation = (await import('./js/components/FooterNavigation.js')).default;
 
         const Dashboard = () => {
             const [view, setView] = useState('gemeenten');
@@ -46,7 +48,8 @@
                         const result = await DDH_CONFIG.queries.haalAllesMetRelaties();
                         setData(result);
                     } catch (error) {
-                        console.error('Data loading error:', error);
+                        console.error('Data loading error, using placeholder data:', error);
+                        setData(TEMP_PLACEHOLDER_DATA);
                     } finally {
                         setLoading(false);
                     }
@@ -111,7 +114,10 @@
                     h('a', { href: '#', className: `nav-item ${view === 'gemeenten' ? 'active' : ''}`, onClick: () => setView('gemeenten') }, 'Gemeenten'),
                     h('a', { href: '#', className: `nav-item ${view === 'pleeglocaties' ? 'active' : ''}`, onClick: () => view === 'problemen' && setView('pleeglocaties') }, 'Locaties'),
                     h('a', { href: '#', className: 'nav-item' }, 'Instellingen')
-                )
+                ),
+                
+                // Footer Navigation
+                h(FooterNavigation)
             );
         };
 

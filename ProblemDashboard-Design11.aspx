@@ -7,7 +7,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400&display=swap');
         * { box-sizing: border-box; }
-        body { font-family: 'Roboto', sans-serif; margin: 0; background-color: #f8f8f8; color: #333; }
+        body { font-family: 'Roboto', sans-serif; margin: 0; padding: 0 0 60px 0; background-color: #f8f8f8; color: #333; }
         .dashboard-container { max-width: 1200px; margin: auto; padding: 20px; }
         .header { text-align: center; padding: 20px 0; border-bottom: 3px solid #333; margin-bottom: 20px; }
         .header h1 { font-family: 'Playfair Display', serif; margin: 0; font-size: 3em; }
@@ -35,6 +35,8 @@
         const { createElement: h, useState, useEffect } = window.React;
         const { createRoot } = window.ReactDOM;
         const { DDH_CONFIG } = await import('./js/config/index.js');
+        const { TEMP_PLACEHOLDER_DATA } = await import('./js/components/pageNavigation.js');
+        const FooterNavigation = (await import('./js/components/FooterNavigation.js')).default;
 
         const Dashboard = () => {
             const [view, setView] = useState('gemeenten');
@@ -53,7 +55,12 @@
                             setSelectedGemeente(gemeenten[0]);
                         }
                     } catch (error) {
-                        console.error('Data loading error:', error);
+                        console.error('Data loading error, using placeholder data:', error);
+                        setData(TEMP_PLACEHOLDER_DATA);
+                        if (TEMP_PLACEHOLDER_DATA.length > 0) {
+                            const gemeenten = Object.keys(TEMP_PLACEHOLDER_DATA.reduce((acc, item) => { acc[item.Gemeente] = true; return acc; }, {}));
+                            setSelectedGemeente(gemeenten[0]);
+                        }
                     } finally {
                         setLoading(false);
                     }
@@ -108,7 +115,10 @@
                             )
                         )
                     )
-                )
+                ),
+                
+                // Footer Navigation
+                h(FooterNavigation)
             );
         };
 

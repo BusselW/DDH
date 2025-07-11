@@ -7,7 +7,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap');
         * { box-sizing: border-box; }
-        body { font-family: 'Space Grotesk', sans-serif; margin: 0; background-color: #111; color: #eee; }
+        body { font-family: 'Space Grotesk', sans-serif; margin: 0; padding: 0 0 60px 0; background-color: #111; color: #eee; }
         #dashboard-root { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
         .header { text-align: center; margin-bottom: 40px; }
         .header h1 { font-size: 3em; margin: 0; color: #fff; text-shadow: 0 0 15px rgba(255,255,255,0.3); }
@@ -31,6 +31,8 @@
         const { createElement: h, useState, useEffect } = window.React;
         const { createRoot } = window.ReactDOM;
         const { DDH_CONFIG } = await import('./js/config/index.js');
+        const { TEMP_PLACEHOLDER_DATA } = await import('./js/components/pageNavigation.js');
+        const FooterNavigation = (await import('./js/components/FooterNavigation.js')).default;
 
         const Dashboard = () => {
             const [view, setView] = useState('gemeenten');
@@ -45,7 +47,9 @@
                         const result = await DDH_CONFIG.queries.haalAllesMetRelaties();
                         setData(result);
                     } catch (error) {
-                        console.error('Data loading error:', error);
+                        console.error('Data loading error, using placeholder data:', error);
+                        // Use placeholder data if SharePoint is not available
+                        setData(TEMP_PLACEHOLDER_DATA);
                     } finally {
                         setLoading(false);
                     }
@@ -102,7 +106,10 @@
                             h('p', { className: 'card-stats' }, `Status: ${probleem.Opgelost_x003f_}`)
                         )
                     )
-                )
+                ),
+                
+                // Footer Navigation
+                h(FooterNavigation)
             );
         };
 

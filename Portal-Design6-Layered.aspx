@@ -9,7 +9,7 @@
         * { box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 0; padding: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0; padding: 0 0 60px 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh; color: #1a202c;
         }
         .portal-container {
@@ -278,8 +278,10 @@
         const { createElement: h, useState, useEffect, useMemo } = window.React;
         const { createRoot } = window.ReactDOM;
 
-        // Import configuration
+        // Import configuration and navigation
         const { DDH_CONFIG } = await import('./js/config/index.js');
+        const { TEMP_PLACEHOLDER_DATA } = await import('./js/components/pageNavigation.js');
+        const FooterNavigation = (await import('./js/components/FooterNavigation.js')).default;
 
         // SVG Icons
         const HomeIcon = () => h('svg', { width: 16, height: 16, viewBox: '0 0 24 24', fill: 'currentColor' },
@@ -315,7 +317,9 @@
                         const result = await DDH_CONFIG.queries.haalAllesMetRelaties();
                         setData(result);
                     } catch (error) {
-                        console.error('Data loading error:', error);
+                        console.error('Data loading error, using placeholder data:', error);
+                        // Use placeholder data if SharePoint is not available
+                        setData(TEMP_PLACEHOLDER_DATA);
                     } finally {
                         setLoading(false);
                     }
@@ -692,7 +696,10 @@
                     currentLayer === 'gemeente' && renderGemeenteLayer(),
                     currentLayer === 'pleeglocatie' && renderPleeglocatieLayer(),
                     currentLayer === 'detail' && renderDetailLayer()
-                )
+                ),
+                
+                // Footer Navigation
+                h(FooterNavigation)
             );
         };
 

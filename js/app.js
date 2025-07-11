@@ -15,6 +15,8 @@ const { createRoot } = window.ReactDOM;
 import { DDHDashboard } from './components/dashboard.js';
 import { createDDHDataService } from './services/ddhDataService.js';
 import { createMockDataService } from './services/mockDataService.js';
+import { TEMP_PLACEHOLDER_DATA } from './components/pageNavigation.js';
+import FooterNavigation from './components/FooterNavigation.js';
 
 /**
  * Main application class
@@ -77,12 +79,18 @@ export class DDHApp {
             throw new Error('Application not initialized');
         }
         
-        this.root.render(
-            h(DDHDashboard, {
-                config: this.config,
-                dataService: this.dataService
-            })
-        );
+        // Create app wrapper with footer navigation
+        const AppWithNavigation = () => {
+            return h('div', null,
+                h(DDHDashboard, {
+                    config: this.config,
+                    dataService: this.dataService
+                }),
+                h(FooterNavigation)
+            );
+        };
+        
+        this.root.render(h(AppWithNavigation));
     }
 
     /**

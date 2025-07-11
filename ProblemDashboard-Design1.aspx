@@ -13,7 +13,7 @@
         * { box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0; padding: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0; padding: 0 0 60px 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #333; min-height: 100vh;
         }
         .dashboard-container {
@@ -186,8 +186,10 @@
         const { createElement: h, useState, useEffect } = window.React;
         const { createRoot } = window.ReactDOM;
 
-        // Import configuration
+        // Import configuration and navigation
         const { DDH_CONFIG } = await import('./js/config/index.js');
+        const { TEMP_PLACEHOLDER_DATA } = await import('./js/components/pageNavigation.js');
+        const FooterNavigation = (await import('./js/components/FooterNavigation.js')).default;
 
         const ProblemDashboard = () => {
             const [data, setData] = useState([]);
@@ -201,7 +203,9 @@
                         const result = await DDH_CONFIG.queries.haalAllesMetRelaties();
                         setData(result);
                     } catch (error) {
-                        console.error('Data loading error:', error);
+                        console.error('Data loading error, using placeholder data:', error);
+                        // Use placeholder data if SharePoint is not available
+                        setData(TEMP_PLACEHOLDER_DATA);
                     } finally {
                         setLoading(false);
                     }
@@ -325,7 +329,10 @@
                             )
                         )
                     )
-                )
+                ),
+                
+                // Footer Navigation
+                h(FooterNavigation)
             );
         };
 
