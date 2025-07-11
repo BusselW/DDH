@@ -2,6 +2,7 @@ import { DDH_CONFIG } from './config/index.js';
 import { ddhDataService } from './dataServices.js';
 import { TEMP_PLACEHOLDER_DATA } from './components/pageNavigation.js';
 import FooterNavigation from './components/FooterNavigation.js';
+import { IconExpand, IconCollapse } from './components/icons.js';
 
 const { createElement: h, useState, useEffect, useCallback } = window.React;
 const { createRoot } = window.ReactDOM;

@@ -12,7 +12,7 @@
             margin: 0; padding: 0 0 60px 0; background: #1a202c; color: #f7fafc;
         }
         .portal-container {
-            height: 100vh; display: flex; flex-direction: column;
+            min-height: 100vh; display: flex; flex-direction: column;
         }
         
         /* Header */
