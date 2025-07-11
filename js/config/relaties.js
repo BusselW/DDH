@@ -68,16 +68,46 @@ export const LIJST_RELATIES = {
  */
 export const RelatieHelpers = {
   /**
-   * Genereer een sleutel voor gemeente + locatie combinatie
+   * Normaliseer een string voor consistente matching
+   * @param {string} str - String om te normaliseren
+   * @returns {string} Genormaliseerde string
+   */
+  normaliseString: (str) => {
+    if (!str || typeof str !== 'string') return '';
+    return str
+      .trim()                           // Remove leading/trailing spaces
+      .toLowerCase()                    // Convert to lowercase
+      .replace(/\s+/g, ' ')            // Replace multiple spaces with single space
+      .replace(/[^\w\s-]/g, '')        // Remove special characters except dashes
+      .trim();                         // Final trim after cleanup
+  },
+
+  /**
+   * Genereer een genormaliseerde sleutel voor gemeente + locatie combinatie
    * @param {string} gemeente - Gemeente naam
    * @param {string} locatie - Locatie naam (pleeglocatie of titel)
-   * @returns {string} Gecombineerde sleutel
+   * @returns {string} Genormaliseerde gecombineerde sleutel
    */
   genereerSleutel: (gemeente, locatie) => {
     if (!gemeente || !locatie) {
       throw new Error('Gemeente en locatie zijn beide vereist voor sleutel generatie');
     }
-    return `${gemeente} - ${locatie}`;
+    const normGemeente = RelatieHelpers.normaliseString(gemeente);
+    const normLocatie = RelatieHelpers.normaliseString(locatie);
+    return `${normGemeente} - ${normLocatie}`;
+  },
+
+  /**
+   * Genereer een genormaliseerde sleutel direct van een object
+   * @param {Object} item - Object met Gemeente en Title/Pleeglocatie velden
+   * @param {string} locatieVeld - Naam van het locatie veld ('Title', 'Pleeglocatie', etc.)
+   * @returns {string} Genormaliseerde sleutel
+   */
+  genereerSleutelVanObject: (item, locatieVeld = 'Title') => {
+    if (!item) return '';
+    const gemeente = item.Gemeente || '';
+    const locatie = item[locatieVeld] || '';
+    return RelatieHelpers.genereerSleutel(gemeente, locatie);
   },
 
   /**
@@ -235,22 +265,39 @@ export const RelatieQueries = {
     const problemenData = await problemenResponse.json();
     const alleProblemen = problemenData.d.results;
 
-    // Groepeer problemen per gemeenteID voor snelle lookup
+    // Groepeer problemen per genormaliseerde sleutel voor snelle lookup
     const problemenPerLocatie = {};
     alleProblemen.forEach(probleem => {
-      const sleutel = probleem.ProbleemID;
+      // Use direct field matching with normalization
+      // In problems list: 'Title' field contains the pleeglocatie name
+      const sleutel = RelatieHelpers.genereerSleutelVanObject(probleem, 'Title');
       if (!problemenPerLocatie[sleutel]) {
         problemenPerLocatie[sleutel] = [];
       }
       problemenPerLocatie[sleutel].push(probleem);
     });
 
-    // Voeg problemen toe aan DH locaties
-    const resultaat = dhLocaties.map(dhLocatie => ({
-      ...dhLocatie,
-      problemen: problemenPerLocatie[dhLocatie.gemeenteID] || [],
-      aantalProblemen: (problemenPerLocatie[dhLocatie.gemeenteID] || []).length
-    }));
+    // Debug logging to see what keys are being generated
+    console.log('Problemen sleutels:', Object.keys(problemenPerLocatie));
+
+    // Voeg problemen toe aan DH locaties met genormaliseerde matching
+    const resultaat = dhLocaties.map(dhLocatie => {
+      // Use direct field matching with normalization instead of calculated gemeenteID
+      const dhSleutel = RelatieHelpers.genereerSleutelVanObject(dhLocatie, 'Title');
+      const matchedProblemen = problemenPerLocatie[dhSleutel] || [];
+      
+      // Debug logging for each DH location
+      if (matchedProblemen.length > 0) {
+        console.log(`Match found: ${dhSleutel} -> ${matchedProblemen.length} problemen`);
+      }
+      
+      return {
+        ...dhLocatie,
+        problemen: matchedProblemen,
+        aantalProblemen: matchedProblemen.length,
+        matchingKey: dhSleutel // Add for debugging
+      };
+    });
 
     return resultaat;
   }

@@ -137,10 +137,12 @@ const TEMP_PLACEHOLDER_DATA = [
         Gemeente: "Amsterdam",
         Status_x0020_B_x0026_S: "Actief",
         Feitcodegroep: "Verkeer",
-        gemeenteID: "Amsterdam - Camera Locatie 1",
+        gemeenteID: "amsterdam - camera locatie 1", // Normalized for testing
         problemen: [
             {
                 Id: 101,
+                Title: "Camera Locatie 1", // Must match parent Title for relationship
+                Gemeente: "Amsterdam", // Must match parent Gemeente for relationship
                 Probleembeschrijving: "Camera defect - geen beeld",
                 Opgelost_x003f_: "Aangemeld",
                 Aanmaakdatum: "2024-01-15T10:30:00Z",
@@ -148,6 +150,8 @@ const TEMP_PLACEHOLDER_DATA = [
             },
             {
                 Id: 102,
+                Title: "Camera Locatie 1", // Must match parent Title for relationship
+                Gemeente: "Amsterdam", // Must match parent Gemeente for relationship
                 Probleembeschrijving: "Slechte beeldkwaliteit door vervuiling",
                 Opgelost_x003f_: "In behandeling",
                 Aanmaakdatum: "2024-01-10T14:20:00Z",
@@ -161,10 +165,12 @@ const TEMP_PLACEHOLDER_DATA = [
         Gemeente: "Rotterdam",
         Status_x0020_B_x0026_S: "Actief",
         Feitcodegroep: "Parkeren",
-        gemeenteID: "Rotterdam - Handhaving Punt 2",
+        gemeenteID: "rotterdam - handhaving punt 2",
         problemen: [
             {
                 Id: 201,
+                Title: "Handhaving Punt 2",
+                Gemeente: "Rotterdam",
                 Probleembeschrijving: "Parkeerautomaat buiten werking",
                 Opgelost_x003f_: "Opgelost",
                 Aanmaakdatum: "2024-01-08T09:15:00Z",
@@ -178,10 +184,12 @@ const TEMP_PLACEHOLDER_DATA = [
         Gemeente: "Utrecht",
         Status_x0020_B_x0026_S: "Inactief",
         Feitcodegroep: "Milieu",
-        gemeenteID: "Utrecht - Controle Locatie 3",
+        gemeenteID: "utrecht - controle locatie 3",
         problemen: [
             {
                 Id: 301,
+                Title: "Controle Locatie 3",
+                Gemeente: "Utrecht",
                 Probleembeschrijving: "Sensor geeft onjuiste metingen",
                 Opgelost_x003f_: "Uitgezet",
                 Aanmaakdatum: "2024-01-12T16:45:00Z",
@@ -189,6 +197,8 @@ const TEMP_PLACEHOLDER_DATA = [
             },
             {
                 Id: 302,
+                Title: "Controle Locatie 3",
+                Gemeente: "Utrecht",
                 Probleembeschrijving: "Dataverbinding onderbroken",
                 Opgelost_x003f_: "Aangemeld",
                 Aanmaakdatum: "2024-01-14T11:30:00Z",
@@ -196,6 +206,8 @@ const TEMP_PLACEHOLDER_DATA = [
             },
             {
                 Id: 303,
+                Title: "Controle Locatie 3",
+                Gemeente: "Utrecht",
                 Probleembeschrijving: "Behuizing beschadigd door vandalen",
                 Opgelost_x003f_: "In behandeling",
                 Aanmaakdatum: "2024-01-13T08:20:00Z",
@@ -209,7 +221,7 @@ const TEMP_PLACEHOLDER_DATA = [
         Gemeente: "Den Haag",
         Status_x0020_B_x0026_S: "Actief",
         Feitcodegroep: "Verkeer",
-        gemeenteID: "Den Haag - Monitoring Station 4",
+        gemeenteID: "den haag - monitoring station 4",
         problemen: []
     },
     {
@@ -218,10 +230,12 @@ const TEMP_PLACEHOLDER_DATA = [
         Gemeente: "Amsterdam",
         Status_x0020_B_x0026_S: "Actief",
         Feitcodegroep: "Openbare Orde",
-        gemeenteID: "Amsterdam - Toezicht Punt 5",
+        gemeenteID: "amsterdam - toezicht punt 5",
         problemen: [
             {
                 Id: 501,
+                Title: "Toezicht Punt 5",
+                Gemeente: "Amsterdam",
                 Probleembeschrijving: "Geluidssensor defect",
                 Opgelost_x003f_: "Opgelost",
                 Aanmaakdatum: "2024-01-05T13:10:00Z",
@@ -229,6 +243,8 @@ const TEMP_PLACEHOLDER_DATA = [
             },
             {
                 Id: 502,
+                Title: "Toezicht Punt 5",
+                Gemeente: "Amsterdam",
                 Probleembeschrijving: "Software update vereist",
                 Opgelost_x003f_: "In behandeling",
                 Aanmaakdatum: "2024-01-16T10:00:00Z",
@@ -242,10 +258,12 @@ const TEMP_PLACEHOLDER_DATA = [
         Gemeente: "Rotterdam",
         Status_x0020_B_x0026_S: "Actief",
         Feitcodegroep: "Verkeer",
-        gemeenteID: "Rotterdam - Controle Camera 6",
+        gemeenteID: "rotterdam - controle camera 6",
         problemen: [
             {
                 Id: 601,
+                Title: "Controle Camera 6",
+                Gemeente: "Rotterdam",
                 Probleembeschrijving: "Lens moet gereinigd worden",
                 Opgelost_x003f_: "Aangemeld",
                 Aanmaakdatum: "2024-01-17T07:30:00Z",
