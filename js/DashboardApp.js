@@ -88,7 +88,8 @@ const DashboardApp = () => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [expandedRows, setExpandedRows] = useState(new Set());
+    const [expandedGemeenten, setExpandedGemeenten] = useState(new Set());
+    const [expandedLocaties, setExpandedLocaties] = useState(new Set());
     const [modalConfig, setModalConfig] = useState(null);
 
     const fetchData = useCallback(async () => {
@@ -125,14 +126,30 @@ const DashboardApp = () => {
         }
     };
 
-    const toggleRow = (id) => {
-        const newExpandedRows = new Set(expandedRows);
-        if (newExpandedRows.has(id)) {
-            newExpandedRows.delete(id);
+    const toggleGemeente = (gemeente) => {
+        const newExpanded = new Set(expandedGemeenten);
+        if (newExpanded.has(gemeente)) {
+            newExpanded.delete(gemeente);
+            // Also collapse all locations in this gemeente
+            const newExpandedLocaties = new Set(expandedLocaties);
+            data.filter(loc => loc.Gemeente === gemeente).forEach(loc => {
+                newExpandedLocaties.delete(loc.Id);
+            });
+            setExpandedLocaties(newExpandedLocaties);
         } else {
-            newExpandedRows.add(id);
+            newExpanded.add(gemeente);
         }
-        setExpandedRows(newExpandedRows);
+        setExpandedGemeenten(newExpanded);
+    };
+
+    const toggleLocatie = (locatieId) => {
+        const newExpanded = new Set(expandedLocaties);
+        if (newExpanded.has(locatieId)) {
+            newExpanded.delete(locatieId);
+        } else {
+            newExpanded.add(locatieId);
+        }
+        setExpandedLocaties(newExpanded);
     };
 
     const renderStatusBadge = (status) => {
@@ -142,47 +159,94 @@ const DashboardApp = () => {
 
     const renderTableRows = () => {
         const rows = [];
+        
+        // Group data by gemeente
+        const dataByGemeente = {};
         data.forEach(dh => {
-            const isExpanded = expandedRows.has(dh.Id);
-            const hasProblemen = dh.problemen && dh.problemen.length > 0;
+            const gemeente = dh.Gemeente || 'Onbekend';
+            if (!dataByGemeente[gemeente]) {
+                dataByGemeente[gemeente] = [];
+            }
+            dataByGemeente[gemeente].push(dh);
+        });
 
-            rows.push(h('tr', { key: dh.Id, className: `dh-row ${hasProblemen ? 'expandable' : ''}`, onClick: () => hasProblemen && toggleRow(dh.Id) },
-                h('td', { style: { display: 'flex', alignItems: 'center' } }, 
-                    h('span', { className: `expander ${isExpanded ? 'expanded' : ''}` }, 
-                        hasProblemen ? (isExpanded ? h(IconCollapse) : h(IconExpand)) : null
+        // Render each gemeente group
+        Object.entries(dataByGemeente).forEach(([gemeente, locations]) => {
+            const isGemeenteExpanded = expandedGemeenten.has(gemeente);
+            const totalProblems = locations.reduce((sum, loc) => sum + (loc.problemen?.length || 0), 0);
+            const totalLocations = locations.length;
+
+            // Gemeente header row
+            rows.push(h('tr', { 
+                key: `gemeente-${gemeente}`, 
+                className: 'gemeente-row expandable',
+                onClick: () => toggleGemeente(gemeente)
+            },
+                h('td', { style: { display: 'flex', alignItems: 'center', fontWeight: 'bold', backgroundColor: '#f8f9fa' } }, 
+                    h('span', { className: `expander ${isGemeenteExpanded ? 'expanded' : ''}` }, 
+                        isGemeenteExpanded ? h(IconCollapse) : h(IconExpand)
                     ),
-                    dh.Title
+                    `📍 ${gemeente}`
                 ),
-                h('td', null, dh.Gemeente),
-                h('td', null, renderStatusBadge(dh.Status_x0020_B_x0026_S)),
-                h('td', null, dh.Waarschuwingsperiode),
-                h('td', null, dh.problemen?.length || 0),
-                h('td', null, 
-                    h('button', { 
-                        className: 'btn btn-secondary', 
-                        onClick: (e) => {
-                            e.stopPropagation();
-                            setModalConfig({ type: 'probleem', data: dh });
-                        }
-                    }, 'Nieuw Probleem')
-                )
+                h('td', { style: { backgroundColor: '#f8f9fa', fontWeight: 'bold' } }, `${totalLocations} locaties`),
+                h('td', { style: { backgroundColor: '#f8f9fa' } }, ''),
+                h('td', { style: { backgroundColor: '#f8f9fa' } }, ''),
+                h('td', { style: { backgroundColor: '#f8f9fa', fontWeight: 'bold' } }, `${totalProblems} problemen`),
+                h('td', { style: { backgroundColor: '#f8f9fa' } }, '')
             ));
 
-            if (isExpanded && hasProblemen) {
-                rows.push(h('tr', { key: `ph-${dh.Id}`, className: 'probleem-header-row' },
-                    h('td', { colSpan: 6 }, 'Gemelde Problemen')
-                ));
-                dh.problemen.forEach(p => {
-                    rows.push(h('tr', { key: `p-${p.Id}`, className: 'probleem-row' },
-                        h('td', null, p.Probleembeschrijving),
-                        h('td', null, p.Feitcodegroep),
-                        h('td', null, renderStatusBadge(p.Opgelost_x003f_)),
-                        h('td', null, new Date(p.Aanmaakdatum).toLocaleDateString('nl-NL')),
-                        h('td', { colSpan: 2 }, '')
+            // Render locations if gemeente is expanded
+            if (isGemeenteExpanded) {
+                locations.forEach(dh => {
+                    const isLocatieExpanded = expandedLocaties.has(dh.Id);
+                    const hasProblemen = dh.problemen && dh.problemen.length > 0;
+
+                    // Location row
+                    rows.push(h('tr', { 
+                        key: dh.Id, 
+                        className: `dh-row ${hasProblemen ? 'expandable' : ''}`, 
+                        onClick: () => hasProblemen && toggleLocatie(dh.Id)
+                    },
+                        h('td', { style: { display: 'flex', alignItems: 'center', paddingLeft: '30px' } }, 
+                            h('span', { className: `expander ${isLocatieExpanded ? 'expanded' : ''}` }, 
+                                hasProblemen ? (isLocatieExpanded ? h(IconCollapse) : h(IconExpand)) : null
+                            ),
+                            `🏢 ${dh.Title}`
+                        ),
+                        h('td', null, dh.Gemeente),
+                        h('td', null, renderStatusBadge(dh.Status_x0020_B_x0026_S)),
+                        h('td', null, dh.Waarschuwingsperiode),
+                        h('td', null, dh.problemen?.length || 0),
+                        h('td', null, 
+                            h('button', { 
+                                className: 'btn btn-secondary', 
+                                onClick: (e) => {
+                                    e.stopPropagation();
+                                    setModalConfig({ type: 'probleem', data: dh });
+                                }
+                            }, 'Nieuw Probleem')
+                        )
                     ));
+
+                    // Render problems if location is expanded
+                    if (isLocatieExpanded && hasProblemen) {
+                        rows.push(h('tr', { key: `ph-${dh.Id}`, className: 'probleem-header-row' },
+                            h('td', { colSpan: 6, style: { paddingLeft: '60px' } }, '🔧 Gemelde Problemen')
+                        ));
+                        dh.problemen.forEach(p => {
+                            rows.push(h('tr', { key: `p-${p.Id}`, className: 'probleem-row' },
+                                h('td', { style: { paddingLeft: '60px' } }, `⚠️ ${p.Probleembeschrijving}`),
+                                h('td', null, p.Feitcodegroep),
+                                h('td', null, renderStatusBadge(p.Opgelost_x003f_)),
+                                h('td', null, new Date(p.Aanmaakdatum).toLocaleDateString('nl-NL')),
+                                h('td', { colSpan: 2 }, '')
+                            ));
+                        });
+                    }
                 });
             }
         });
+        
         return rows;
     };
 

@@ -647,3 +647,50 @@ body {
         font-size: 13px;
     }
 }
+
+/* Hierarchical grouping styles for gemeente → pleeglocatie → problemen */
+.gemeente-row { 
+    background-color: #f8f9fa !important; 
+    border-left: 4px solid #0078d4; 
+    cursor: pointer; 
+}
+.gemeente-row:hover { 
+    background-color: #e9ecef !important; 
+}
+.gemeente-row td { 
+    font-weight: bold; 
+    font-size: 16px; 
+    padding: 15px; 
+}
+.gemeente-row .expander {
+    margin-right: 12px;
+}
+
+/* Enhanced location row styling */
+.dh-row td:first-child { 
+    border-left: 3px solid #28a745; 
+}
+.dh-row:hover td:first-child {
+    border-left: 3px solid #1e7e34;
+}
+
+/* Enhanced problem row styling */
+.probleem-row td:first-child { 
+    border-left: 3px solid #ffc107; 
+    padding-left: 60px !important;
+}
+.probleem-row:hover td:first-child {
+    border-left: 3px solid #e0a800;
+}
+
+/* Problem header styling */
+.probleem-header-row { 
+    background-color: #f8f9fa; 
+    font-weight: bold; 
+    color: #495057; 
+    border-left: 4px solid #17a2b8 !important;
+}
+.probleem-header-row td { 
+    padding: 12px; 
+    font-size: 14px;
+}
