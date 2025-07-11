@@ -38,11 +38,20 @@
         .header-actions {
             display: flex; gap: 12px; align-items: center;
         }
+        .breadcrumb {
+            display: flex; align-items: center; gap: 8px; font-size: 14px; color: rgba(255,255,255,0.9);
+        }
+        .breadcrumb-item {
+            cursor: pointer; transition: opacity 0.2s ease;
+            display: flex; align-items: center; gap: 4px;
+        }
+        .breadcrumb-item:hover { opacity: 0.8; }
+        .breadcrumb-separator { margin: 0 4px; opacity: 0.6; }
         .refresh-btn {
             background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.3);
             color: white; padding: 8px 16px; border-radius: 8px; cursor: pointer;
             font-size: 14px; font-weight: 600; backdrop-filter: blur(10px);
-            transition: all 0.2s ease;
+            transition: all 0.2s ease; display: flex; align-items: center; gap: 6px;
         }
         .refresh-btn:hover { background: rgba(255,255,255,0.25); }
         .last-update {
@@ -259,10 +268,194 @@
             animation: spin 1s linear infinite;
         }
         
+        /* Layered Navigation Styles */
+        .layer-title {
+            text-align: center; margin-bottom: 32px;
+        }
+        .layer-title h2 {
+            font-size: 28px; font-weight: 700; color: #1a202c; margin: 0 0 8px 0;
+        }
+        .layer-title p {
+            font-size: 16px; color: #64748b; margin: 0;
+        }
+        
+        .gemeente-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px; margin-bottom: 32px;
+        }
+        .gemeente-card {
+            background: white; border-radius: 16px; padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08); cursor: pointer;
+            transition: all 0.3s ease; border: 2px solid transparent;
+        }
+        .gemeente-card:hover {
+            transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+            border-color: #3b82f6;
+        }
+        .gemeente-card.has-problems {
+            border-color: #dc2626;
+        }
+        .gemeente-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 16px;
+        }
+        .gemeente-name {
+            font-size: 20px; font-weight: 700; color: #1a202c; margin: 0;
+        }
+        .gemeente-badge {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white;
+            padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+            display: flex; align-items: center; gap: 4px;
+        }
+        .gemeente-stats {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+        }
+        
+        .pleeglocatie-layer, .detail-layer {
+            background: white; border-radius: 20px; padding: 32px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .layer-header {
+            text-align: center; margin-bottom: 32px;
+        }
+        .layer-header h2 {
+            font-size: 24px; font-weight: 700; color: #1a202c; margin: 0 0 8px 0;
+        }
+        .layer-header p {
+            font-size: 16px; color: #64748b; margin: 0;
+        }
+        
+        .pleeglocatie-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .pleeglocatie-card {
+            background: white; border-radius: 12px; padding: 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08); cursor: pointer;
+            transition: all 0.3s ease; border-left: 4px solid #e5e7eb;
+        }
+        .pleeglocatie-card:hover {
+            transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+        .pleeglocatie-card.has-problems {
+            border-left-color: #dc2626;
+        }
+        .locatie-header {
+            margin-bottom: 12px;
+        }
+        .locatie-name {
+            font-size: 16px; font-weight: 600; color: #1a202c; margin-bottom: 8px;
+        }
+        .locatie-badges {
+            display: flex; gap: 8px;
+        }
+        .badge {
+            padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;
+            display: flex; align-items: center; gap: 4px;
+        }
+        .badge.problems { background: #fef2f2; color: #dc2626; }
+        .badge.resolved { background: #f0fdf4; color: #16a34a; }
+        .locatie-meta {
+            font-size: 13px; color: #64748b; line-height: 1.4;
+        }
+        
+        .detail-header {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 24px; padding-bottom: 20px; border-bottom: 2px solid #f1f5f9;
+        }
+        .detail-title {
+            font-size: 28px; font-weight: 800; color: #1a202c; margin: 0 0 4px 0;
+        }
+        .detail-subtitle {
+            font-size: 16px; color: #64748b; margin: 0;
+        }
+        .filter-buttons {
+            display: flex; gap: 8px;
+        }
+        .filter-btn {
+            padding: 8px 16px; border: 2px solid #e5e7eb; background: white;
+            border-radius: 8px; font-size: 14px; cursor: pointer; font-weight: 600;
+            transition: all 0.2s ease; display: flex; align-items: center; gap: 6px;
+        }
+        .filter-btn.active {
+            background: #3b82f6; color: white; border-color: #3b82f6;
+        }
+        .filter-btn:hover:not(.active) { background: #f8fafc; }
+        
+        .detail-sections {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px;
+        }
+        .detail-section {
+            background: #f8fafc; border-radius: 12px; padding: 20px;
+        }
+        .section-title {
+            font-size: 16px; font-weight: 600; color: #1a202c; margin: 0 0 16px 0;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .links-grid {
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .link-card {
+            display: flex; align-items: center; gap: 8px; padding: 12px;
+            background: white; border-radius: 8px; text-decoration: none;
+            color: #374151; font-size: 14px; font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .link-card:hover {
+            background: #3b82f6; color: white;
+        }
+        .contact-info {
+            font-size: 14px; color: #374151; line-height: 1.6;
+        }
+        
+        .problems-section {
+            background: #f8fafc; border-radius: 12px; padding: 20px;
+        }
+        .problems-list {
+            display: flex; flex-direction: column; gap: 12px;
+        }
+        .problem-card {
+            background: white; border-radius: 12px; padding: 16px;
+            border-left: 4px solid #e5e7eb; transition: all 0.2s ease;
+        }
+        .problem-card.active { border-left-color: #dc2626; }
+        .problem-card.resolved { border-left-color: #16a34a; opacity: 0.8; }
+        .problem-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 8px;
+        }
+        .problem-id {
+            font-size: 12px; color: #64748b; font-weight: 600;
+        }
+        .problem-age {
+            font-size: 11px; color: #9ca3af; display: flex; align-items: center; gap: 4px;
+        }
+        .problem-description {
+            font-size: 14px; color: #374151; line-height: 1.4; margin-bottom: 12px;
+        }
+        .problem-footer {
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .problem-category {
+            background: #3b82f6; color: white; padding: 4px 8px;
+            border-radius: 12px; font-size: 11px; font-weight: 600;
+        }
+        .problem-status {
+            padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;
+        }
+        .problem-status.aangemeld { background: #fef2f2; color: #dc2626; }
+        .problem-status.behandeling { background: #eff6ff; color: #2563eb; }
+        .problem-status.uitgezet { background: #fffbeb; color: #d97706; }
+        .problem-status.opgelost { background: #f0fdf4; color: #16a34a; }
+        .empty-state {
+            text-align: center; padding: 40px; color: #64748b;
+        }
+        
         /* Responsive */
         @media (max-width: 1400px) {
             .dashboard-grid { grid-template-columns: 1fr; }
             .data-tables { grid-template-columns: 1fr; }
+            .detail-sections { grid-template-columns: 1fr; }
         }
         @media (max-width: 1024px) {
             .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
@@ -292,13 +485,24 @@
         const { createElement: h, useState, useEffect, useMemo } = window.React;
         const { createRoot } = window.ReactDOM;
 
-        // Import configuration
+        // Import configuration and SVG icons
         const { DDH_CONFIG } = await import('./js/config/index.js');
+        const SvgIcons = await import('./js/components/svgIcons.js');
+        const { 
+            HomeIcon, LocationIcon, BuildingIcon, CityIcon, CheckIcon, WarningIcon,
+            AlertIcon, SearchIcon, FilterIcon, ProblemIcon, ActiveProblemIcon,
+            ResolvedIcon, DocumentIcon, LinkIcon, ContactIcon, BackIcon, TimeIcon,
+            ChartIcon, TrendUpIcon, RefreshIcon
+        } = SvgIcons;
 
         const ExecutiveDashboard = () => {
             const [data, setData] = useState([]);
             const [loading, setLoading] = useState(true);
             const [lastUpdate, setLastUpdate] = useState(new Date());
+            const [currentLayer, setCurrentLayer] = useState('gemeente'); // 'gemeente', 'pleeglocatie', 'detail'
+            const [selectedGemeente, setSelectedGemeente] = useState(null);
+            const [selectedPleeglocatie, setSelectedPleeglocatie] = useState(null);
+            const [problemFilter, setProblemFilter] = useState('all'); // 'all', 'active', 'resolved'
 
             useEffect(() => {
                 const fetchData = async () => {
@@ -412,6 +616,215 @@
                 );
             }
 
+            // Gemeente selection layer
+            const renderGemeenteSelection = () => {
+                const gemeenteData = useMemo(() => {
+                    const grouped = {};
+                    data.forEach(location => {
+                        const gemeente = location.Gemeente;
+                        if (!grouped[gemeente]) {
+                            grouped[gemeente] = {
+                                name: gemeente,
+                                locations: [],
+                                totalProblems: 0,
+                                activeProblems: 0,
+                                resolvedProblems: 0
+                            };
+                        }
+                        grouped[gemeente].locations.push(location);
+                        const problems = location.problemen || [];
+                        grouped[gemeente].totalProblems += problems.length;
+                        grouped[gemeente].activeProblems += problems.filter(p => p.Opgelost_x003f_ !== 'Opgelost').length;
+                        grouped[gemeente].resolvedProblems += problems.filter(p => p.Opgelost_x003f_ === 'Opgelost').length;
+                    });
+                    return Object.values(grouped);
+                }, [data]);
+
+                return h('div', { className: 'gemeente-grid' },
+                    gemeenteData.map(gemeente => {
+                        return h('div', {
+                            key: gemeente.name,
+                            className: `gemeente-card ${gemeente.activeProblems > 0 ? 'has-problems' : ''}`,
+                            onClick: () => {
+                                setSelectedGemeente(gemeente.name);
+                                setCurrentLayer('pleeglocatie');
+                            }
+                        },
+                            h('div', { className: 'gemeente-header' },
+                                h('h3', { className: 'gemeente-name' }, gemeente.name),
+                                h('div', { className: 'gemeente-badge' }, 
+                                    h(BuildingIcon, { size: 16 }), ` ${gemeente.locations.length}`
+                                )
+                            ),
+                            h('div', { className: 'gemeente-stats' },
+                                h('div', { className: 'stat-item' },
+                                    h('div', { className: 'stat-number' }, gemeente.totalProblems),
+                                    h('div', { className: 'stat-label' }, 'Totaal')
+                                ),
+                                h('div', { className: 'stat-item' },
+                                    h('div', { className: 'stat-number' }, gemeente.activeProblems),
+                                    h('div', { className: 'stat-label' }, 'Actief')
+                                ),
+                                h('div', { className: 'stat-item' },
+                                    h('div', { className: 'stat-number' }, gemeente.resolvedProblems),
+                                    h('div', { className: 'stat-label' }, 'Opgelost')
+                                )
+                            )
+                        );
+                    })
+                );
+            };
+
+            // Pleeglocatie layer
+            const renderPleeglocatieLayer = () => {
+                const locations = data.filter(loc => loc.Gemeente === selectedGemeente);
+                
+                return h('div', { className: 'pleeglocatie-layer' },
+                    h('div', { className: 'layer-header' },
+                        h('h2', null, `Pleeglocaties in ${selectedGemeente}`),
+                        h('p', null, 'Selecteer een locatie voor gedetailleerde informatie')
+                    ),
+                    h('div', { className: 'pleeglocatie-grid' },
+                        locations.map(location => {
+                            const problems = location.problemen || [];
+                            const activeProblems = problems.filter(p => p.Opgelost_x003f_ !== 'Opgelost').length;
+                            const resolvedProblems = problems.filter(p => p.Opgelost_x003f_ === 'Opgelost').length;
+                            
+                            return h('div', {
+                                key: location.Id,
+                                className: `pleeglocatie-card ${activeProblems > 0 ? 'has-problems' : ''}`,
+                                onClick: () => {
+                                    setSelectedPleeglocatie(location);
+                                    setCurrentLayer('detail');
+                                }
+                            },
+                                h('div', { className: 'locatie-header' },
+                                    h('div', { className: 'locatie-name' }, location.Title),
+                                    h('div', { className: 'locatie-badges' },
+                                        activeProblems > 0 && h('span', { className: 'badge problems' }, 
+                                            h(WarningIcon, { size: 12 }), ` ${activeProblems}`
+                                        ),
+                                        resolvedProblems > 0 && h('span', { className: 'badge resolved' }, 
+                                            h(CheckIcon, { size: 12 }), ` ${resolvedProblems}`
+                                        )
+                                    )
+                                ),
+                                h('div', { className: 'locatie-meta' },
+                                    h('p', null, `Status: ${location.Status_x0020_B_x0026_S || 'Onbekend'}`),
+                                    h('p', null, `Feitcode: ${location.Feitcodegroep}`),
+                                    h('p', null, `${problems.length} problemen geregistreerd`)
+                                )
+                            );
+                        })
+                    )
+                );
+            };
+
+            // Detail layer
+            const renderDetailLayer = () => {
+                if (!selectedPleeglocatie) return null;
+                
+                const problems = selectedPleeglocatie.problemen || [];
+                const filteredProblems = problems.filter(problem => {
+                    if (problemFilter === 'active') return problem.Opgelost_x003f_ !== 'Opgelost';
+                    if (problemFilter === 'resolved') return problem.Opgelost_x003f_ === 'Opgelost';
+                    return true;
+                });
+                
+                return h('div', { className: 'detail-layer' },
+                    h('div', { className: 'detail-header' },
+                        h('div', { className: 'detail-title-section' },
+                            h('h2', { className: 'detail-title' }, selectedPleeglocatie.Title),
+                            h('p', { className: 'detail-subtitle' }, `${selectedPleeglocatie.Gemeente} • Handhavingslocatie`)
+                        ),
+                        h('div', { className: 'filter-buttons' },
+                            h('button', {
+                                className: `filter-btn ${problemFilter === 'all' ? 'active' : ''}`,
+                                onClick: () => setProblemFilter('all')
+                            }, 'Alle'),
+                            h('button', {
+                                className: `filter-btn ${problemFilter === 'active' ? 'active' : ''}`,
+                                onClick: () => setProblemFilter('active')
+                            }, h(AlertIcon, { size: 14 }), ' Actief'),
+                            h('button', {
+                                className: `filter-btn ${problemFilter === 'resolved' ? 'active' : ''}`,
+                                onClick: () => setProblemFilter('resolved')
+                            }, h(CheckIcon, { size: 14 }), ' Opgelost')
+                        )
+                    ),
+                    
+                    // Documents and contact section
+                    h('div', { className: 'detail-sections' },
+                        h('div', { className: 'detail-section' },
+                            h('h3', { className: 'section-title' }, h(DocumentIcon, { size: 18 }), ' Documenten & Links'),
+                            h('div', { className: 'links-grid' },
+                                h('a', { 
+                                    href: '#',
+                                    className: 'link-card',
+                                    onClick: (e) => e.preventDefault()
+                                },
+                                    h(DocumentIcon, { size: 16 }),
+                                    h('span', null, 'Schouwrapporten')
+                                ),
+                                h('a', { 
+                                    href: '#',
+                                    className: 'link-card',
+                                    onClick: (e) => e.preventDefault()
+                                },
+                                    h(LinkIcon, { size: 16 }),
+                                    h('span', null, 'Algemeen PV')
+                                )
+                            )
+                        ),
+                        h('div', { className: 'detail-section' },
+                            h('h3', { className: 'section-title' }, h(ContactIcon, { size: 18 }), ' Contactgegevens'),
+                            h('div', { className: 'contact-info' },
+                                h('p', null, `Gemeente: ${selectedPleeglocatie.Gemeente}`),
+                                h('p', null, `Status B&S: ${selectedPleeglocatie.Status_x0020_B_x0026_S || 'Niet beschikbaar'}`),
+                                h('p', null, `Feitcodegroep: ${selectedPleeglocatie.Feitcodegroep}`)
+                            )
+                        )
+                    ),
+                    
+                    // Problems list
+                    h('div', { className: 'problems-section' },
+                        h('h3', { className: 'section-title' }, 
+                            h(ProblemIcon, { size: 18 }), 
+                            ` Problemen (${filteredProblems.length})`
+                        ),
+                        filteredProblems.length === 0 ? 
+                            h('div', { className: 'empty-state' }, 
+                                h('p', null, 'Geen problemen gevonden voor deze filter.')
+                            ) :
+                            h('div', { className: 'problems-list' },
+                                filteredProblems.map(problem => {
+                                    const daysSince = Math.floor((new Date() - new Date(problem.Aanmaakdatum)) / (1000 * 60 * 60 * 24));
+                                    const isResolved = problem.Opgelost_x003f_ === 'Opgelost';
+                                    
+                                    return h('div', {
+                                        key: problem.Id,
+                                        className: `problem-card ${isResolved ? 'resolved' : 'active'}`
+                                    },
+                                        h('div', { className: 'problem-header' },
+                                            h('div', { className: 'problem-id' }, `Probleem #${problem.Id}`),
+                                            h('div', { className: 'problem-age' }, 
+                                                h(TimeIcon, { size: 12 }), ` ${daysSince} dagen geleden`
+                                            )
+                                        ),
+                                        h('div', { className: 'problem-description' }, problem.Probleembeschrijving),
+                                        h('div', { className: 'problem-footer' },
+                                            h('div', { className: 'problem-category' }, problem.Feitcodegroep),
+                                            h('div', {
+                                                className: `problem-status ${(problem.Opgelost_x003f_ || '').toLowerCase().replace(/\s+/g, '-')}`
+                                            }, problem.Opgelost_x003f_ || 'Onbekend')
+                                        )
+                                    );
+                                })
+                            )
+                    )
+                );
+            };
+
             return h('div', null,
                 // Header
                 h('div', { className: 'portal-header' },
@@ -421,7 +834,30 @@
                             h('p', { className: 'portal-subtitle' }, 'Strategisch overzicht van handhavingsoperaties')
                         ),
                         h('div', { className: 'header-actions' },
-                            h('button', { className: 'refresh-btn', onClick: refreshData }, '🔄 Vernieuwen'),
+                            // Breadcrumb navigation
+                            h('div', { className: 'breadcrumb' },
+                                h('span', {
+                                    className: 'breadcrumb-item',
+                                    onClick: () => {
+                                        setCurrentLayer('gemeente');
+                                        setSelectedGemeente(null);
+                                        setSelectedPleeglocatie(null);
+                                    }
+                                }, h(HomeIcon, { size: 16 }), ' Home'),
+                                currentLayer !== 'gemeente' && h('span', { className: 'breadcrumb-separator' }, ' > '),
+                                currentLayer !== 'gemeente' && h('span', {
+                                    className: 'breadcrumb-item',
+                                    onClick: () => {
+                                        setCurrentLayer('pleeglocatie');
+                                        setSelectedPleeglocatie(null);
+                                    }
+                                }, selectedGemeente),
+                                currentLayer === 'detail' && h('span', { className: 'breadcrumb-separator' }, ' > '),
+                                currentLayer === 'detail' && h('span', { className: 'breadcrumb-item' }, selectedPleeglocatie?.Title)
+                            ),
+                            h('button', { className: 'refresh-btn', onClick: refreshData }, 
+                                h(RefreshIcon, { size: 16 }), ' Vernieuwen'
+                            ),
                             h('div', { className: 'last-update' },
                                 `Laatste update: ${lastUpdate.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })}`
                             )
@@ -429,11 +865,25 @@
                     )
                 ),
 
-                // KPI Cards
+                // Layer Navigation Container
+                currentLayer === 'gemeente' && h('div', { className: 'kpi-grid' },
+                    // KPI Cards for gemeente overview
+                    h('div', { className: 'layer-title' },
+                        h('h2', null, 'Selecteer een Gemeente'),
+                        h('p', null, 'Klik op een gemeente om pleeglocaties te bekijken')
+                    )
+                ),
+                
+                // Gemeente selection or other layers
+                currentLayer === 'gemeente' && renderGemeenteSelection(),
+                currentLayer === 'pleeglocatie' && renderPleeglocatieLayer(),
+                currentLayer === 'detail' && renderDetailLayer(),
+                
+                // KPI Cards (shown on all layers)
                 h('div', { className: 'kpi-grid' },
                     h('div', { className: 'kpi-card primary' },
                         h('div', { className: 'kpi-header' },
-                            h('div', { className: 'kpi-icon' }, '🏢'),
+                            h('div', { className: 'kpi-icon' }, h(BuildingIcon, { size: 20 })),
                             h('div', { className: 'kpi-trend stable' }, 'Stabiel')
                         ),
                         h('div', { className: 'kpi-value' }, metrics.totalLocations),
@@ -442,7 +892,7 @@
                     ),
                     h('div', { className: 'kpi-card danger' },
                         h('div', { className: 'kpi-header' },
-                            h('div', { className: 'kpi-icon' }, '🚨'),
+                            h('div', { className: 'kpi-icon' }, h(AlertIcon, { size: 20 })),
                             h('div', { className: 'kpi-trend up' }, `${metrics.activeProblems > 50 ? '+' : ''}${Math.round((metrics.activeProblems / metrics.totalProblems) * 100)}%`)
                         ),
                         h('div', { className: 'kpi-value' }, metrics.activeProblems),
@@ -451,7 +901,7 @@
                     ),
                     h('div', { className: 'kpi-card success' },
                         h('div', { className: 'kpi-header' },
-                            h('div', { className: 'kpi-icon' }, '✅'),
+                            h('div', { className: 'kpi-icon' }, h(CheckIcon, { size: 20 })),
                             h('div', { className: 'kpi-trend down' }, `${metrics.resolutionRate}%`)
                         ),
                         h('div', { className: 'kpi-value' }, metrics.resolvedProblems),
@@ -460,7 +910,7 @@
                     ),
                     h('div', { className: 'kpi-card warning' },
                         h('div', { className: 'kpi-header' },
-                            h('div', { className: 'kpi-icon' }, '⏱️'),
+                            h('div', { className: 'kpi-icon' }, h(TimeIcon, { size: 20 })),
                             h('div', { className: 'kpi-trend stable' }, 'Gem.')
                         ),
                         h('div', { className: 'kpi-value' }, `${metrics.avgResolutionTime}d`),
@@ -469,8 +919,8 @@
                     )
                 ),
 
-                // Main Dashboard Grid
-                h('div', { className: 'dashboard-grid' },
+                // Only show dashboard grid on gemeente layer
+                currentLayer === 'gemeente' && h('div', { className: 'dashboard-grid' },
                     // Chart Container
                     h('div', { className: 'chart-container' },
                         h('div', { className: 'chart-header' },
@@ -482,7 +932,7 @@
                             )
                         ),
                         h('div', { className: 'chart-placeholder' },
-                            h('div', { className: 'chart-icon' }, '📊'),
+                            h('div', { className: 'chart-icon' }, h(ChartIcon, { size: 48 })),
                             h('div', null, 'Interactieve grafieken worden hier weergegeven'),
                             h('small', null, 'Trends van nieuwe vs. opgeloste problemen over tijd')
                         )
@@ -603,7 +1053,8 @@
                         recentActivity.length > 0 ? recentActivity.map((activity, index) => {
                             return h('div', { key: activity.id || index, className: 'activity-item' },
                                 h('div', { className: `activity-icon ${activity.type}` }, 
-                                    activity.type === 'resolved' ? '✅' : activity.type === 'new' ? '🆕' : '📝'
+                                    activity.type === 'resolved' ? h(CheckIcon, { size: 14 }) : 
+                                    activity.type === 'new' ? h(AlertIcon, { size: 14 }) : h(DocumentIcon, { size: 14 })
                                 ),
                                 h('div', { className: 'activity-content' },
                                     h('div', { className: 'activity-text' }, activity.text),
