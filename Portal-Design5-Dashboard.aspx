@@ -614,6 +614,29 @@
                 return activities.slice(0, 8);
             }, [metrics.allProblems]);
 
+            // Gemeente data for selection layer - moved to top level to avoid conditional hook calls
+            const gemeenteSelectionData = useMemo(() => {
+                const grouped = {};
+                data.forEach(location => {
+                    const gemeente = location.Gemeente;
+                    if (!grouped[gemeente]) {
+                        grouped[gemeente] = {
+                            name: gemeente,
+                            locations: [],
+                            totalProblems: 0,
+                            activeProblems: 0,
+                            resolvedProblems: 0
+                        };
+                    }
+                    grouped[gemeente].locations.push(location);
+                    const problems = location.problemen || [];
+                    grouped[gemeente].totalProblems += problems.length;
+                    grouped[gemeente].activeProblems += problems.filter(p => p.Opgelost_x003f_ !== 'Opgelost').length;
+                    grouped[gemeente].resolvedProblems += problems.filter(p => p.Opgelost_x003f_ === 'Opgelost').length;
+                });
+                return Object.values(grouped);
+            }, [data]);
+
             if (loading) {
                 return h('div', { className: 'loading-overlay' },
                     h('div', { className: 'loading-spinner' }),
@@ -623,30 +646,9 @@
 
             // Gemeente selection layer
             const renderGemeenteSelection = () => {
-                const gemeenteData = useMemo(() => {
-                    const grouped = {};
-                    data.forEach(location => {
-                        const gemeente = location.Gemeente;
-                        if (!grouped[gemeente]) {
-                            grouped[gemeente] = {
-                                name: gemeente,
-                                locations: [],
-                                totalProblems: 0,
-                                activeProblems: 0,
-                                resolvedProblems: 0
-                            };
-                        }
-                        grouped[gemeente].locations.push(location);
-                        const problems = location.problemen || [];
-                        grouped[gemeente].totalProblems += problems.length;
-                        grouped[gemeente].activeProblems += problems.filter(p => p.Opgelost_x003f_ !== 'Opgelost').length;
-                        grouped[gemeente].resolvedProblems += problems.filter(p => p.Opgelost_x003f_ === 'Opgelost').length;
-                    });
-                    return Object.values(grouped);
-                }, [data]);
 
                 return h('div', { className: 'gemeente-grid' },
-                    gemeenteData.map(gemeente => {
+                    gemeenteSelectionData.map(gemeente => {
                         return h('div', {
                             key: gemeente.name,
                             className: `gemeente-card ${gemeente.activeProblems > 0 ? 'has-problems' : ''}`,

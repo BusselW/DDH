@@ -88,8 +88,8 @@ const FooterNavigation = () => {
                     fontSize: '12px',
                     fontWeight: 'bold'
                 }
-            }, '← Previous (A)'),
-            h('span', { style: { color: '#ccc' } }, 'Use arrow keys or A/D to navigate')
+            }, '← Vorige (A)'),
+            h('span', { style: { color: '#ccc' } }, 'Gebruik pijltjestoetsen of A/D om te navigeren')
         ),
         
         // Center - Page info
@@ -103,14 +103,14 @@ const FooterNavigation = () => {
             }
         },
             h('div', { style: { fontWeight: 'bold', marginBottom: '2px' } }, pageInfo.title),
-            h('div', { style: { fontSize: '11px', color: '#ccc' } }, `Page ${pageInfo.index} of ${pageInfo.total}`)
+            h('div', { style: { fontSize: '11px', color: '#ccc' } }, `Pagina ${pageInfo.index} van ${pageInfo.total}`)
         ),
         
         // Right side - Next button
         h('div', {
             style: { display: 'flex', alignItems: 'center', gap: '10px' }
         },
-            h('span', { style: { color: '#ccc' } }, 'Temporary Demo Mode'),
+            h('span', { style: { color: '#ccc' } }, 'Tijdelijke Demo Modus'),
             h('button', {
                 onClick: handleNext,
                 disabled: isNavigating,
@@ -125,7 +125,7 @@ const FooterNavigation = () => {
                     fontSize: '12px',
                     fontWeight: 'bold'
                 }
-            }, 'Next (D) →')
+            }, 'Volgende (D) →')
         )
     );
 };
