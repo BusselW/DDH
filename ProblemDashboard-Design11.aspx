@@ -76,7 +76,7 @@
                 return acc;
             }, {});
 
-            const currentPleeglocaties = selectedGemeente ? gemeentenData[selectedGemeente].pleeglocaties : [];
+            const currentPleeglocaties = selectedGemeente ? (gemeentenData[selectedGemeente]?.pleeglocaties || []) : [];
 
             return h('div', null,
                 h('header', { className: 'header' }, h('h1', null, 'Het DDH Dagblad')),
@@ -87,10 +87,10 @@
                         !selectedPleeglocatie && currentPleeglocaties.map(pleeglocatie => 
                             h('div', { key: pleeglocatie.Id, className: 'item-card', onClick: () => setSelectedPleeglocatie(pleeglocatie) },
                                 h('h3', { className: 'card-title' }, pleeglocatie.Title),
-                                h('p', { className: 'card-stats' }, `${pleeglocatie.problemen.length} problemen gemeld`)
+                                h('p', { className: 'card-stats' }, `${(pleeglocatie.problemen || []).length} problemen gemeld`)
                             )
                         ),
-                        selectedPleeglocatie && selectedPleeglocatie.problemen.map(probleem => 
+                        selectedPleeglocatie && (selectedPleeglocatie.problemen || []).map(probleem => 
                             h('div', { key: probleem.Id, className: 'item-card' },
                                 h('h3', { className: 'card-title' }, `Probleem #${probleem.Id}`),
                                 h('p', null, h('strong', null, 'Status: '), probleem.Opgelost_x003f_)
@@ -104,7 +104,7 @@
                                 h('h2', { className: 'details-title' }, selectedPleeglocatie.Title),
                                 h('p', null, h('strong', null, 'Contactpersoon: '), selectedPleeglocatie.emailContactpersoon?.Description || 'N/A'),
                                 h('h3', { className: 'card-title' }, 'Problemen'),
-                                h('ul', { className: 'probleem-list' }, selectedPleeglocatie.problemen.map(p => h('li', {key: p.Id}, p.Probleembeschrijving)))
+                                h('ul', { className: 'probleem-list' }, (selectedPleeglocatie.problemen || []).map(p => h('li', {key: p.Id}, p.Probleembeschrijving)))
                             )
                         )
                     )

@@ -80,7 +80,7 @@
                         const gemeente = item.Gemeente;
                         if (!acc[gemeente]) acc[gemeente] = { pleeglocaties: 0, problemen: 0 };
                         acc[gemeente].pleeglocaties++;
-                        acc[gemeente].problemen += item.problemen.length;
+                        acc[gemeente].problemen += (item.problemen || []).length;
                         return acc;
                     }, {})).map(([gemeente, stats]) => 
                         h('div', { key: gemeente, className: 'gemeente-card', onClick: () => handleGemeenteClick(gemeente) },
@@ -89,12 +89,12 @@
                         )
                     ),
                     view === 'pleeglocaties' && data.filter(item => item.Gemeente === selectedGemeente).map(pleeglocatie =>
-                        h('div', { key: pleeglocatie.Id, className: `pleeglocatie-card ${pleeglocatie.problemen.length > 0 ? 'has-problems' : ''}`, onClick: () => handlePleeglocatieClick(pleeglocatie) },
+                        h('div', { key: pleeglocatie.Id, className: `pleeglocatie-card ${(pleeglocatie.problemen || []).length > 0 ? 'has-problems' : ''}`, onClick: () => handlePleeglocatieClick(pleeglocatie) },
                             h('h2', { className: 'card-title' }, pleeglocatie.Title),
-                            h('p', { className: 'card-stats' }, `${pleeglocatie.problemen.length} problemen`)
+                            h('p', { className: 'card-stats' }, `${(pleeglocatie.problemen || []).length} problemen`)
                         )
                     ),
-                    view === 'problemen' && selectedPleeglocatie.problemen.map(probleem => 
+                    view === 'problemen' && (selectedPleeglocatie.problemen || []).map(probleem => 
                         h('div', { key: probleem.Id, className: 'probleem-card' },
                             h('h2', { className: 'card-title' }, `Probleem #${probleem.Id}`),
                             h('div', { className: 'probleem-details' },
