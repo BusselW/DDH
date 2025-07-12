@@ -327,6 +327,20 @@
                 fetchData();
             }, []);
 
+            // Helper functions for status displays
+            const getStatusBadgeColor = (status) => {
+                switch(status) {
+                    case 'Instemming verleend': return '#22c55e'; // green
+                    case 'In behandeling': return '#f59e0b'; // yellow  
+                    case 'Aangevraagd': return '#ef4444'; // red
+                    default: return '#6b7280'; // gray
+                }
+            };
+
+            const getWaarschuwingsperiodeColor = (hasWarning) => {
+                return hasWarning === 'Ja' ? '#22c55e' : '#ef4444';
+            };
+
             // Group data by gemeente
             const groupedData = useMemo(() => {
                 const grouped = {};
@@ -387,10 +401,12 @@
                             className: 'gemeente-card',
                             onClick: () => handleGemeenteClick(gemeente)
                         },
+                            // Layer 1: Display Gemeente as Header/Title (required for data entry)
                             h('div', { className: 'gemeente-header' },
                                 h('h3', { className: 'gemeente-name' }, gemeente),
-                                h('div', { className: 'gemeente-badge' }, `${locations.length} locaties`)
+                                h('div', { className: 'gemeente-badge' }, 'Digitale Handhaving')
                             ),
+                            // Note: gemeenteID and Gemeente fields are hidden as specified but used for data submission
                             h('div', { className: 'gemeente-stats' },
                                 h('div', { className: 'stat-item' },
                                     h('div', { className: 'stat-number' }, totalProblems),
@@ -405,6 +421,7 @@
                                     h('div', { className: 'stat-label' }, 'Opgelost')
                                 )
                             ),
+                            // Display subtitle for Digitale Handhaving (required for data entry)
                             h('div', { className: 'gemeente-preview' },
                                 `${locations.length} handhavingslocaties met ${activeProblems} actieve problemen. `,
                                 `${Math.round((resolvedProblems / Math.max(totalProblems, 1)) * 100)}% opgelost.`
@@ -427,6 +444,12 @@
                             const activeProblems = problems.filter(p => p.Opgelost_x003f_ !== 'Opgelost').length;
                             const resolvedProblems = problems.length - activeProblems;
                             const hasProblems = activeProblems > 0;
+                            
+                            // Layer 2 field specifications
+                            const statusBS = location.Status_x0020_B_x0026_S || 'Onbekend';
+                            const statusColor = getStatusBadgeColor(statusBS);
+                            const waarschuwingsperiode = location.Waarschuwingsperiode === 'Ja';
+                            const waarschuwingColor = getWaarschuwingsperiodeColor(location.Waarschuwingsperiode);
 
                             return h('div', {
                                 key: location.Id,
@@ -435,11 +458,120 @@
                             },
                                 h('div', { className: 'pleeglocatie-header' },
                                     h('h4', { className: 'pleeglocatie-name' }, location.Title),
-                                    h('div', { className: 'pleeglocatie-status' }, 
-                                        `Status: ${location.Status_x0020_B_x0026_S || 'Onbekend'}`
+                                    // Status B&S with color coding (green/yellow/red based on yes/maybe/no)
+                                    h('div', { 
+                                        className: 'pleeglocatie-status',
+                                        style: { 
+                                            display: 'flex', 
+                                            alignItems: 'center', 
+                                            gap: '8px',
+                                            marginBottom: '8px'
+                                        }
+                                    }, 
+                                        h('span', { 
+                                            style: { 
+                                                width: '8px', 
+                                                height: '8px', 
+                                                backgroundColor: statusColor, 
+                                                borderRadius: '50%' 
+                                            } 
+                                        }),
+                                        `Status B&S: ${statusBS}`,
+                                        // Instemmingsbesluit grouped subtly with Status B&S
+                                        location.Instemmingsbesluit?.Url && h('a', {
+                                            href: location.Instemmingsbesluit.Url,
+                                            target: '_blank',
+                                            style: { 
+                                                marginLeft: '8px', 
+                                                fontSize: '12px', 
+                                                color: '#667eea',
+                                                textDecoration: 'none'
+                                            },
+                                            onClick: (e) => e.stopPropagation()
+                                        }, '📄')
                                     )
                                 ),
-                                h('div', { className: 'problem-summary' },
+                                // Links as clickable elements
+                                h('div', { style: { marginBottom: '12px', display: 'flex', gap: '8px' } },
+                                    location.Link_x0020_Algemeen_x0020_PV?.Url && h('a', {
+                                        href: location.Link_x0020_Algemeen_x0020_PV.Url,
+                                        target: '_blank',
+                                        style: { 
+                                            color: '#667eea', 
+                                            textDecoration: 'none',
+                                            fontSize: '12px',
+                                            padding: '4px 8px',
+                                            backgroundColor: '#f0f4ff',
+                                            borderRadius: '4px'
+                                        },
+                                        onClick: (e) => e.stopPropagation()
+                                    }, 'Algemeen PV'),
+                                    location.Link_x0020_Schouwrapporten?.Url && h('a', {
+                                        href: location.Link_x0020_Schouwrapporten.Url,
+                                        target: '_blank',
+                                        style: { 
+                                            color: '#667eea', 
+                                            textDecoration: 'none',
+                                            fontSize: '12px',
+                                            padding: '4px 8px',
+                                            backgroundColor: '#f0f4ff',
+                                            borderRadius: '4px'
+                                        },
+                                        onClick: (e) => e.stopPropagation()
+                                    }, 'Schouwrapporten')
+                                ),
+                                // Waarschuwingsperiode with green/red color coding
+                                h('div', { style: { marginBottom: '12px' } },
+                                    h('div', {
+                                        style: {
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '6px',
+                                            padding: '4px 8px',
+                                            backgroundColor: waarschuwingColor,
+                                            color: 'white',
+                                            borderRadius: '12px',
+                                            fontSize: '12px',
+                                            fontWeight: '600'
+                                        }
+                                    }, 
+                                        `Waarschuwingsperiode: ${location.Waarschuwingsperiode || 'Onbekend'}`
+                                    ),
+                                    // Conditional date displays (hide if Waarschuwingsperiode = Nee)
+                                    waarschuwingsperiode && h('div', { 
+                                        style: { 
+                                            fontSize: '11px', 
+                                            color: '#64748b', 
+                                            marginTop: '4px' 
+                                        } 
+                                    },
+                                        location.Start_x0020_Waarschuwingsperiode && `Start: ${new Date(location.Start_x0020_Waarschuwingsperiode).toLocaleDateString('nl-NL')}`,
+                                        location.Start_x0020_Waarschuwingsperiode && location.Einde_x0020_Waarschuwingsperiode && ' | ',
+                                        location.Einde_x0020_Waarschuwingsperiode && `Einde: ${new Date(location.Einde_x0020_Waarschuwingsperiode).toLocaleDateString('nl-NL')}`,
+                                        location.Laatste_x0020_schouw && h('div', null, `Laatste schouw: ${new Date(location.Laatste_x0020_schouw).toLocaleDateString('nl-NL')}`)
+                                    )
+                                ),
+                                // Feitcodegroep as subtle tag
+                                h('div', { style: { marginBottom: '8px' } },
+                                    h('span', {
+                                        style: {
+                                            fontSize: '11px',
+                                            backgroundColor: '#f1f5f9',
+                                            color: '#64748b',
+                                            padding: '2px 6px',
+                                            borderRadius: '8px'
+                                        }
+                                    }, location.Feitcodegroep)
+                                ),
+                                // E-mail with mailto link
+                                location.E_x002d_mailadres_x0020_contactp && h('div', { style: { fontSize: '12px' } },
+                                    h('a', {
+                                        href: `mailto:${location.E_x002d_mailadres_x0020_contactp}`,
+                                        style: { color: '#667eea', textDecoration: 'none' },
+                                        onClick: (e) => e.stopPropagation()
+                                    }, location.E_x002d_mailadres_x0020_contactp)
+                                ),
+                                h('div', { className: 'problem-summary', style: { marginTop: '12px' } },
                                     h('div', null,
                                         h('span', { className: `problem-count ${activeProblems > 0 ? 'active' : 'resolved'}` },
                                             `${activeProblems} actief`
@@ -452,10 +584,6 @@
                                     h('div', { style: { fontSize: '12px', color: '#94a3b8' } },
                                         `${problems.length} totaal`
                                     )
-                                ),
-                                h('div', { className: 'pleeglocatie-meta' },
-                                    `Feitcodegroep: ${location.Feitcodegroep} • `,
-                                    `Waarschuwingsperiode: ${location.Waarschuwingsperiode || 'Onbekend'}`
                                 )
                             );
                         })
@@ -607,7 +735,136 @@
                                                 h('div', { className: 'problem-id' }, `Probleem #${problem.Id}`),
                                                 h('div', { className: 'problem-age' }, `${daysSince} dagen geleden`)
                                             ),
-                                            h('div', { className: 'problem-description' }, problem.Probleembeschrijving),
+                                            // Layer 3: Probleembeschrijving in visually pleasing/noticeable memo field
+                                            h('div', { 
+                                                className: 'problem-description',
+                                                style: {
+                                                    backgroundColor: '#f8fafc',
+                                                    border: '2px solid #e2e8f0',
+                                                    borderRadius: '8px',
+                                                    padding: '12px',
+                                                    margin: '8px 0',
+                                                    fontStyle: 'italic',
+                                                    lineHeight: '1.5'
+                                                }
+                                            }, problem.Probleembeschrijving),
+                                            // Dates in dd-mm-yyyy format
+                                            h('div', { style: { fontSize: '12px', color: '#64748b', marginBottom: '8px' } },
+                                                problem.Startdatum && `Start: ${new Date(problem.Startdatum).toLocaleDateString('nl-NL')}`,
+                                                problem.Startdatum && problem.Einddatum && ' | ',
+                                                problem.Einddatum && `Einde: ${new Date(problem.Einddatum).toLocaleDateString('nl-NL')}`
+                                            ),
+                                            // People-picker fields with profile pictures (placeholder for now)
+                                            h('div', { style: { display: 'flex', gap: '12px', marginBottom: '8px', flexWrap: 'wrap' } },
+                                                problem.Melder && h('div', { 
+                                                    style: { 
+                                                        display: 'flex', 
+                                                        alignItems: 'center', 
+                                                        gap: '4px',
+                                                        fontSize: '11px',
+                                                        backgroundColor: '#e0f2fe',
+                                                        padding: '4px 8px',
+                                                        borderRadius: '12px'
+                                                    } 
+                                                },
+                                                    // Profile picture placeholder
+                                                    h('div', {
+                                                        style: {
+                                                            width: '16px',
+                                                            height: '16px',
+                                                            borderRadius: '50%',
+                                                            backgroundColor: '#0284c7',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            color: 'white',
+                                                            fontSize: '8px',
+                                                            fontWeight: 'bold'
+                                                        }
+                                                    }, (problem.Melder.Title || 'M').charAt(0).toUpperCase()),
+                                                    `Melder: ${problem.Melder.Title || 'Onbekend'}`
+                                                ),
+                                                problem.Eigenaar && h('div', { 
+                                                    style: { 
+                                                        display: 'flex', 
+                                                        alignItems: 'center', 
+                                                        gap: '4px',
+                                                        fontSize: '11px',
+                                                        backgroundColor: '#f0fdf4',
+                                                        padding: '4px 8px',
+                                                        borderRadius: '12px'
+                                                    } 
+                                                },
+                                                    h('div', {
+                                                        style: {
+                                                            width: '16px',
+                                                            height: '16px',
+                                                            borderRadius: '50%',
+                                                            backgroundColor: '#16a34a',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            color: 'white',
+                                                            fontSize: '8px',
+                                                            fontWeight: 'bold'
+                                                        }
+                                                    }, (problem.Eigenaar.Title || 'E').charAt(0).toUpperCase()),
+                                                    `Eigenaar: ${problem.Eigenaar.Title || 'Onbekend'}`
+                                                ),
+                                                problem.Beoordelaar && h('div', { 
+                                                    style: { 
+                                                        display: 'flex', 
+                                                        alignItems: 'center', 
+                                                        gap: '4px',
+                                                        fontSize: '11px',
+                                                        backgroundColor: '#fef3c7',
+                                                        padding: '4px 8px',
+                                                        borderRadius: '12px'
+                                                    } 
+                                                },
+                                                    h('div', {
+                                                        style: {
+                                                            width: '16px',
+                                                            height: '16px',
+                                                            borderRadius: '50%',
+                                                            backgroundColor: '#d97706',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            color: 'white',
+                                                            fontSize: '8px',
+                                                            fontWeight: 'bold'
+                                                        }
+                                                    }, (problem.Beoordelaar.Title || 'B').charAt(0).toUpperCase()),
+                                                    `Beoordelaar: ${problem.Beoordelaar.Title || 'Onbekend'}`
+                                                )
+                                            ),
+                                            // Actie Beoordelaars as memo note with different color
+                                            problem.Actie_x0020_Beoordelaars && h('div', {
+                                                style: {
+                                                    backgroundColor: '#fef2f2',
+                                                    border: '1px solid #fecaca',
+                                                    borderRadius: '6px',
+                                                    padding: '8px',
+                                                    fontSize: '12px',
+                                                    marginBottom: '8px',
+                                                    fontWeight: '600',
+                                                    color: '#dc2626'
+                                                }
+                                            }, `Actie: ${problem.Actie_x0020_Beoordelaars}`),
+                                            // Uitleg actie beoordelaar as extension/tooltip
+                                            problem.Uitleg_x0020_actie_x0020_beoorde && h('div', {
+                                                style: {
+                                                    backgroundColor: '#f9fafb',
+                                                    border: '1px solid #e5e7eb',
+                                                    borderRadius: '6px',
+                                                    padding: '8px',
+                                                    fontSize: '11px',
+                                                    color: '#6b7280',
+                                                    marginBottom: '8px',
+                                                    fontStyle: 'italic'
+                                                }
+                                            }, `Uitleg: ${problem.Uitleg_x0020_actie_x0020_beoorde}`),
                                             h('div', { className: 'problem-footer' },
                                                 h('div', { className: 'problem-category' }, problem.Feitcodegroep),
                                                 h('div', {
